@@ -1,13 +1,30 @@
 services:
-  - name: besu
+  - name: besu1
     image: "hyperledger/besu:develop"
     script:
-      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/tmp/genesis.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --data-path=/var/lib/besu
+      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE && sleep 60
     input-files:
       - source-path: ./genesis.json
-        destination-path: /tmp/genesis.json
-      - source-path: ./static-nodes.json
-        destination-path: /var/lib/besu/static-nodes.json
+        destination-path: /var/lib/besu/genesis.json
+      - source-path: ./keystore/pk1
+        destination-path: /var/lib/besu/key
+    volumes:
+      - path: /staticpeers/
+        name: staticpeers
+        scope: singleton
+    resources:
+      cpus: 2
+      memory: 3 GB
+      storage: 5 GiB
+  - name: besu2
+    image: "hyperledger/besu:develop"
+    script:
+      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE  && sleep 60
+    input-files:
+      - source-path: ./genesis.json
+        destination-path: /var/lib/besu/genesis.json
+      - source-path: ./keystore/pk2
+        destination-path: /var/lib/besu/key
     volumes:
       - path: /staticpeers/
         name: staticpeers
@@ -27,19 +44,26 @@ task-runners:
         name: staticpeers
         scope: singleton
     script:
-      inline: ./besuStaticPeers generate -a '[{"privateKey":"317f5a5a1e73f10202e9d601834c387a8d6769aab87afe9bfba318e309224e42", "publicKey":"9de23f4bcd0354611424e8787e0ad26c491d2f6e76101c16ddfd311fd1be71bf4675cbf252559617e220224af048e194e881c8c6165040d73c7d23fcb279b750", "address":"0xb8172dc7230f3b84787331a976218d57735b65bb"},{"privateKey":"cfee8b81a9966d58e2fe5e8c6914c7b309ca795a36551e9765d62a65c3cea56d", "publicKey":"480e689b2638fec9b4353c2ede5d1af83138cca3023baf72f1b6ec792fe5396cbe91177d50ad8cae8eaa0369e93c78575990227048358537e92eb54208fb074d", "address":"0xc7413a023619b09b8749598750236100badb07f7"},{"privateKey":"5d07b874ec190c444ed1a39a6104a1eaafab1e5837c259f520c3ae2e287c857d", "publicKey":"06bc1cae6689171185c7875bae0f3d7cc2556f4422944c986fe04b32864775c7bd3323f1b8020ffa4d4192ae90aa35fc3b974942145c7b718bf1f1eca360b51", "address":"0x7244c095104cc570f3e25549ee717cf0a961d889"}]' --ip '["'$BESU_SERVICE0_BESU_NETWORK'", "'$BESU_SERVICE1_BESU_NETWORK'", "'$BESU_SERVICE2_BESU_NETWORK'"]' >> /staticpeers/static-nodes.json
+      inline:  ./besuStaticPeers generate -a '[{"publicKey":"b0ec8003f44030987b8c994e06bd6517183ef633f35ce6f65af90a68d524ca64b8670044d633f9ab4c57291a2a3df2437664061759f809e735628db10b07803b"},{"publicKey":"e38b41307f4752121385c6f67cb4de0d59c1230127ef3722d25cc2a29363b9319cb5f9e4dc2b5c20754dddad43376547d5348191a54b7e4977631b62d5a15166"}]' --ip '["'$BESU1_SERVICE0_BESU_NETWORK'", "'$BESU2_SERVICE0_BESU_NETWORK'"]' >> /staticpeers/static-nodes.json
 tests:
   - name: baseline
-    description: run a simple hyperledger besu testnet consisting of 3 besu nodes
+    description: run a simple hyperledger besu testnet consisting of 2 besu nodes
     phases:
       - name: genesis
         tasks:
           - type: static-peers
+            timeout: 3 m
       - name: spin-up-nodes
         system:
-          - name: besu
-            type: besu
-            count: 3
+          - name: besu1
+            type: besu1
+            count: 1
+            resources:
+              networks:
+                - name: besu-network
+          - name: besu2
+            type: besu2
+            count: 1
             resources:
               networks:
                 - name: besu-network
