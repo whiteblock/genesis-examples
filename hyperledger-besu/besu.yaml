@@ -1,0 +1,96 @@
+services:
+  - name: besu1
+    image: "hyperledger/besu:develop"
+    script:
+      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE && sleep 60
+    input-files:
+      - source-path: ./genesis.json
+        destination-path: /var/lib/besu/genesis.json
+      - source-path: ./keystore/pk1
+        destination-path: /var/lib/besu/key
+    volumes:
+      - path: /staticpeers/
+        name: staticpeers
+        scope: singleton
+    resources:
+      cpus: 2
+      memory: 3 GB
+      storage: 5 GiB
+  - name: besu2
+    image: "hyperledger/besu:develop"
+    script:
+      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE  && sleep 60
+    input-files:
+      - source-path: ./genesis.json
+        destination-path: /var/lib/besu/genesis.json
+      - source-path: ./keystore/pk2
+        destination-path: /var/lib/besu/key
+    volumes:
+      - path: /staticpeers/
+        name: staticpeers
+        scope: singleton
+    resources:
+      cpus: 2
+      memory: 3 GB
+      storage: 5 GiB
+  - name: besu3
+    image: "hyperledger/besu:develop"
+    script:
+      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE  && sleep 60
+    input-files:
+      - source-path: ./genesis.json
+        destination-path: /var/lib/besu/genesis.json
+      - source-path: ./keystore/pk3
+        destination-path: /var/lib/besu/key
+    volumes:
+      - path: /staticpeers/
+        name: staticpeers
+        scope: singleton
+    resources:
+      cpus: 2
+      memory: 3 GB
+      storage: 5 GiB
+task-runners:
+  - name: wait
+    script:
+      inline: sleep 1800
+  - name: static-peers # generate static peers
+    image: "gcr.io/whiteblock/helpers/besu/staticpeers:master"
+    volumes:
+      - path: /staticpeers/
+        name: staticpeers
+        scope: singleton
+    script:
+      inline:  ./besuStaticPeers generate -a '[{"publicKey":"b0ec8003f44030987b8c994e06bd6517183ef633f35ce6f65af90a68d524ca64b8670044d633f9ab4c57291a2a3df2437664061759f809e735628db10b07803b"},{"publicKey":"e38b41307f4752121385c6f67cb4de0d59c1230127ef3722d25cc2a29363b9319cb5f9e4dc2b5c20754dddad43376547d5348191a54b7e4977631b62d5a15166"},{"publicKey":"42c581c1b4368f2dff8d76a1450e37af55fc9d4681354b3530974c85ddaef191f4179bda883d2d79b921741070d56894186fa2bc3ec6ea37e53b08d81b4fb47c"}]' --ip '["'$BESU1_SERVICE0_BESU_NETWORK'", "'$BESU2_SERVICE0_BESU_NETWORK'", "'$BESU3_SERVICE0_BESU_NETWORK'"]' >> /staticpeers/static-nodes.json
+tests:
+  - name: baseline
+    description: run a simple hyperledger besu testnet consisting of 3 besu nodes
+    phases:
+      - name: genesis
+        tasks:
+          - type: static-peers
+            timeout: 3 m
+      - name: spin-up-nodes
+        system:
+          - name: besu1
+            type: besu1
+            count: 1
+            resources:
+              networks:
+                - name: besu-network
+          - name: besu2
+            type: besu2
+            count: 1
+            resources:
+              networks:
+                - name: besu-network
+          - name: besu3
+            type: besu3
+            count: 1
+            resources:
+              networks:
+                - name: besu-network
+      - name: wait
+        tasks:
+          - type: wait
+            timeout: 1800 s
