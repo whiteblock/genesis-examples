@@ -2,7 +2,7 @@ services:
   - name: besu1
     image: "hyperledger/besu:develop"
     script:
-      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE && sleep 60
+      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE
     input-files:
       - source-path: ./genesis.json
         destination-path: /var/lib/besu/genesis.json
@@ -19,7 +19,7 @@ services:
   - name: besu2
     image: "hyperledger/besu:develop"
     script:
-      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE  && sleep 60
+      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE
     input-files:
       - source-path: ./genesis.json
         destination-path: /var/lib/besu/genesis.json
@@ -36,7 +36,7 @@ services:
   - name: besu3
     image: "hyperledger/besu:develop"
     script:
-      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE  && sleep 60
+      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE 
     input-files:
       - source-path: ./genesis.json
         destination-path: /var/lib/besu/genesis.json
