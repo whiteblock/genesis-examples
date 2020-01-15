@@ -1,0 +1,93 @@
+services: # all four lighthouse nodes will be defined as separate services as they each require a slightly different script to start up on the same testnet
+  - name: lighthouse_1 # first lighthouse node
+    image: sigp/lighthouse
+    script:
+      inline: "lighthouse bn --http --http-address 0.0.0.0 --http-port 5052 testnet --spec minimal -r quick 8 1578595164" # script for bootnode
+    resources:
+      cpus: 1
+      memory: 2 GB
+      storage: 5 GiB
+  - name: validator_client
+    image: sigp/lighthouse
+    script:
+      inline: "lighthouse vc --server http://${LIGHTHOUSE_1_SERVICE0_LIGHTHOUSE_NETWORK}:5052 testnet --spec minimal insecure 0 8"
+    resources:
+      cpus: 1
+      memory: 1 GB
+      storage: 2 GiB
+  - name: lighthouse_2 # second lighthouse node
+    image: sigp/lighthouse
+    script:
+      inline: "lighthouse bn --libp2p-addresses /ip4/${LIGHTHOUSE_1_SERVICE0_LIGHTHOUSE_NETWORK}/tcp/9000 testnet --spec minimal -r quick 8 1578595164" # script for second node to attach to bootnodes network
+    resources:
+      cpus: 1
+      memory: 2 GB
+      storage: 5 GiB
+  - name: lighthouse_3 # third lighthouse node 
+    image: sigp/lighthouse
+    script:
+      inline: "lighthouse bn --libp2p-addresses /ip4/${LIGHTHOUSE_1_SERVICE0_LIGHTHOUSE_NETWORK}/tcp/9000 testnet --spec minimal -r quick 8 1578595164" # script for third node to attach to bootnodes network, must increment by -b value by 10 for each subsequent node, as specified by lighthouse docs
+    resources:
+      cpus: 1
+      memory: 2 GB
+      storage: 5 GiB   
+  - name: lighthouse_4 # fourth lighthouse node
+    image: sigp/lighthouse
+    script:
+      inline: "lighthouse bn --libp2p-addresses /ip4/${LIGHTHOUSE_1_SERVICE0_LIGHTHOUSE_NETWORK}/tcp/9000 testnet --spec minimal -r quick 8 1578595164" # script for fourth node to attach to bootnodes network, incremented -b by 10 once again
+    resources:
+      cpus: 1
+      memory: 2 GB
+      storage: 5 GiB                       
+task-runners:
+  - name: start-first-node # allow some time for first node to start up
+    script:
+      inline: sleep 60
+  - name: testnet-expiration
+    script: 
+      inline: sleep 600    
+tests:
+  - name: exercise-lighthouse
+    description: run a lighthouse testnet and validate some blocks
+    system:
+      - name: lighthouse_1 # have to define all system components individually (listing all four separate lighthouse nodes) and connecting them to the same network: "lighthouse-network"
+        type: lighthouse_1
+        count: 1
+        resources:
+          networks:
+            - name: lighthouse-network                                    
+    phases:
+      - name: start # phase 1
+        description: spin up lighthouse node 1          
+        tasks: 
+        - type: start-first-node  
+      - name: baseline # phase 2
+        description: run a basic test where all four lighthouse nodes are spun up
+        system: 
+        - name: validator_client
+          type: validator_client
+          count: 1
+          resources:
+            networks:
+              - name: lighthouse-network
+        - name: lighthouse_2
+          type: lighthouse_2
+          count: 1
+          resources:
+            networks:
+              - name: lighthouse-network
+        - name: lighthouse_3
+          type: lighthouse_3
+          count: 1
+          resources:
+            networks:
+              - name: lighthouse-network
+        - name: lighthouse_4
+          type: lighthouse_4
+          count: 1
+          resources:
+            networks:
+              - name: lighthouse-network  
+        tasks:
+        - type: testnet-expiration
+          timeout: 11 m

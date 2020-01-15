@@ -1,0 +1,26 @@
+services:
+  - name: prysm-beacon
+    image: gcr.io/prysmaticlabs/prysm/beacon-chain:latest
+    args:
+      - --datadir=/data
+      - --init-sync-no-verify
+    resources:
+      cpus: 2
+      memory: 2 GB
+      storage: 5 GiB
+task-runners:
+  - name: testnet-expiration
+    script: 
+      inline: sleep 600
+tests:
+  - name: simple-prysm-exercise
+    description: run a prysm testnet and validate some blocks
+    system:
+      - name: beacon-node-testnet
+        type: prysm-beacon
+        count: 4
+    phases:
+      - name: basic
+        tasks:
+          - type: testnet-expiration
+            timeout: 11 m

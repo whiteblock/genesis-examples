@@ -1,0 +1,30 @@
+services:
+  - name: artemis
+    image: pegasyseng/artemis:develop
+    args:
+      - -c=/opt/artemis/config/artemisConfig.toml
+    volumes:
+      - path: /var/log/artemis
+        name: artemis-logs
+    resources:
+      cpus: 1
+      memory: 1 GB
+      storage: 1 GiB
+    input-files:
+      - source-path: artemisConfig.toml
+        destination-path: /opt/artemis/config/artemisConfig.toml
+task-runners:
+  - name: testnet-expiration
+    script:
+      inline: sleep 600
+tests:
+  - name: running-artemis
+    description: run simple artemis testnet with four nodes
+    system:
+      - type: artemis
+        count: 4
+    phases:
+      - name: baseline
+        tasks:
+          - type: testnet-expiration
+            timeout: 11 m

@@ -1,0 +1,93 @@
+services: # here, you should define all the main services that you'd like to include in your test(s)
+  - name: service_1 # first type of service
+    image: example/image # docker image that must be compatible with the `docker pull` command, tag defaults to 'latest'
+    resources:
+      cpus: 2 # service_1 will be allotted 2 vCPUs (default is 1 vCPU, if cpus are not specified)
+      memory: 2 GB # service_1 will be allotted 2 GB of memory (default is 512 MB, if memory is not specified)
+      storage: 5 GiB # service_1 will be allotted 5 GiB of storage (default is 8 GiB, if storage is not specified)
+  - name: service_2 # second type of service
+    image: "example/image:1.13.19" # docker image, including tag (must be in quotes because YAML requires strings that contain the : character to be quoted)
+    resources:
+      cpus: 3
+      memory: 4 GB
+      storage: 5 GiB
+sidecars: # here, you should define all the sidecars that you'd like to include in your test(s)
+  - name: sidecar_1 # first type of sidecar
+    sidecar-to: # specifies which services this sidecar is attached to (in this case, sidecar_1 is a sidecar to both service_1 and service_2)
+       - service_1
+       - service_2
+    image: example/image
+    resources: # note, cpus are not specified here, and will therefore default to 1 vCPU
+      memory: 1 GB
+      storage: 2 GiB
+task-runners: # here, you should specify all the tasks you'd like your system(s) to perform throughout the duration of your test(s)
+  - name: task_1 # first task (tasks don't necessarily have to be defined in the order in which they should be executed -- they will only execute during the phase in which they're included)
+    script: # script can either be inline or a source-path to a local file
+      inline: curl http://localhost:4000 >> /path/to/volumeDirectory/output.json
+    volumes: # here, you can define volumes to be read from and/or written to
+      - name: myVolume
+        path: /path/to/volumeDirectory
+  - name: task_2 # this task will print the data written to output.json in task_1
+    script:
+      inline: print ${/path/to/volumeDirectory/output.json}
+  - name: task_3 # this task will write to output_2.txt
+    script:
+      inline: curl http://localhost:4000 >> /path/to/volumeDirectory/output_2.txt
+    volumes:
+      - name: mySecondVolume
+        path: /path/to/secondVolumeDirectory
+tests: # here, you should define your test(s) - a minimum of one test is required
+  - name: test_1 
+    description: run one alpha service on both the common-network and alpha-network, run one beta service on both the common-network and beta-network, and run two gamma sidecars on all three networks mentioned
+    system: # here, you define what services and sidecars you'd like to include in the test
+      - name: alpha # give your service instance a name
+        type: service_1
+        count: 1 # one instance of service_1 will be provisioned in this test
+        resources: # here, you can modify the resources you've already specified in the `services` array and also specify the networks to which you'd like your service to be connected
+          networks: # alpha will be connected to both the common-network and alpha-network
+            - name: common-network 
+            - name: alpha-network   
+        sidecars: 
+        - name: gamma
+          type: sidecar_1           
+      - name: beta
+        type: service_2
+        count: 1
+        resources:
+          networks: # beta will be connected to both the common-network and beta-network
+            - name: common-network
+            - name: beta-network  
+        sidecars: 
+        - name: gamma
+          type: sidecar_1                                                   
+    phases: # here, you should define all the logical steps you'd like your test to perform (they will be executed in the sequence in which they're defined)
+      - name: phase_1
+        description: this phase runs first and writes to output.json
+        tasks: # runs task_1 during phase_1
+          - type: task_1 
+            timeout: 3 m # a 3-minute time limit will be placed on the execution of task_1 -- task_1 will be terminated after 3 minutes if it doesn't finish before then.
+      - name: phase_2
+        description: this phase runs second and reads from output.json
+        tasks: # runs both task_2 and task_3 during phase_2 -- these tasks will run concurrently
+          - type: task_2 # task_2 does not have a timeout specified, meaning that the timeout will default to 2 minutes
+          - type: task_3 
+            timeout: infinite # the value `infinite` for timeout tells Genesis not to terminate the task or phase until task_3 is fully completed -- no timeout will be enforced
+      - name: phase_3
+        description: this phase runs third and mutates the system to increase the number of beta instances from 1 to 2
+        system: # here, we change the system definition slightly by increasing the instances of beta from 1 to 2
+          - name: beta
+            type: service_2
+            count: 2
+        tasks:
+          - type: task_1
+            timeout: 3 m
+      - name: phase_4
+        description: this phase runs fourth, reduces the number of instances of beta from 2 to 1
+        system: 
+          - name: beta
+            type: service_2
+            count: 1 # run one instance of service_1
+        tasks:
+          - type: task_2
+          - type: task_3
+            timeout: infinite

@@ -1,0 +1,36 @@
+services:
+  - name: nginx
+    image: nginx:alpine
+    resources:
+      cpus: 1
+      memory: 500 MB
+      storage: 1 GiB
+    input-files:
+      - source-path: index.html
+        destination-path: /usr/share/nginx/html/index.html
+      - source-path: other.html
+        destination-path: /usr/share/nginx/html/other.html
+task-runners:
+  - name: wait-10-minutes
+    script:
+      inline: sleep 600
+tests:
+  - name: serve-static-files
+    description: Serve the default static content of the nginx image.
+    system:
+      - name: nginx
+        type: nginx
+        count: 1
+        port-mappings:
+          - "80:80"
+    phases:
+      - name: testnet
+        system:
+          - type: nginx
+            name: nginx
+            resources:
+              networks:
+                - name: nginx
+        tasks:
+          - type: wait-10-minutes
+            timeout: 600s
