@@ -2,10 +2,12 @@ services:
   - name: besu
     image: "hyperledger/besu:develop"
     script:
-      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/tmp/genesis.json --miner-enabled --discovery-enabled=false --data-path=/var/lib/besu
+      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/tmp/genesis.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --data-path=/var/lib/besu
     input-files:
       - source-path: ./genesis.json
         destination-path: /tmp/genesis.json
+      - source-path: ./static-nodes.json
+        destination-path: /var/lib/besu/static-nodes.json
     volumes:
       - path: /staticpeers/
         name: staticpeers
@@ -19,7 +21,7 @@ task-runners:
     script:
       inline: sleep 1800
   - name: static-peers # generate static peers
-    image: "gcr.io/whiteblock/helpers/besu/staticpeers"
+    image: "gcr.io/whiteblock/helpers/besu/staticpeers:master"
     volumes:
       - path: /staticpeers/
         name: staticpeers
