@@ -1,9 +1,9 @@
 services:
   - name: gossip-node0
-    image: gcr.io/whiteblock/gossipsub
-    shared-volumes:
-      - source-path: /output/
-        name: gossip-logs
+    image: "gcr.io/whiteblock/gossipsub:master"
+    volumes:
+      - name: gossip-logs
+        path: /output/
     resources:
       cpus: 1
       memory: 4 GB
@@ -22,10 +22,10 @@ services:
     script:
       inline: ./start.sh
   - name: gossip-node1
-    image: gcr.io/whiteblock/gossipsub
-    shared-volumes:
-      - source-path: /output/
-        name: gossip-logs
+    image: "gcr.io/whiteblock/gossipsub:master"
+    volumes:
+      - name: gossip-logs
+        path: /output/
     resources:
       cpus: 1
       memory: 4 GB
@@ -44,10 +44,10 @@ services:
     script:
       inline: ./start.sh
   - name: gossip-node2
-    image: gcr.io/whiteblock/gossipsub
-    shared-volumes:
-      - source-path: /output/
-        name: gossip-logs
+    image: "gcr.io/whiteblock/gossipsub:master"
+    volumes:
+      - name: gossip-logs
+        path: /output/
     resources:
       cpus: 1
       memory: 4 GB
@@ -66,10 +66,10 @@ services:
     script:
       inline: ./start.sh
   - name: gossip-node3
-    image: gcr.io/whiteblock/gossipsub
-    shared-volumes:
-      - source-path: /output/
-        name: gossip-logs
+    image: "gcr.io/whiteblock/gossipsub:master"
+    volumes:
+      - name: gossip-logs
+        path: /output/
     resources:
       cpus: 1
       memory: 4 GB
@@ -88,10 +88,10 @@ services:
     script:
       inline: ./start.sh
   - name: orchestra-node
-    image: gcr.io/whiteblock/gossipsub
-    shared-volumes:
-      - source-path: /output/
-        name: gossip-logs
+    image: "gcr.io/whiteblock/gossipsub:master"
+    volumes:
+      - name: gossip-logs
+        path: /output/
     resources:
       cpus: 1
       memory: 4 GB
@@ -112,34 +112,40 @@ services:
 task-runners:
   - name: topology-generator
     # image has to include and build the packages that will be necessary to run the helper
-    image: gcr.io/whiteblock/helpers/topologygen
-    output-files:
-      - /topology/peers_0.txt
-      - /topology/peers_1.txt
-      - /topology/peers_2.txt
-      - /topology/peers_3.txt
+    image: "gcr.io/whiteblock/helpers/topologygen:master"
+    volumes: # stores files peers_*.txt
+      - name: topologies
+        path: /topology/
     script:
       inline: python topo.py 42 4 2 true
+  - name: gossip-send-messages # TODO define this task
+    script:
+      inline: sleep 400
 tests:
   - name: gossip-load-test
     description: run a gossip network and send messages
-    system:
-    - type: gossip-node0
-      count: 1
-    - type: gossip-node1
-      count: 1
-    - type: gossip-node2
-      count: 1
-    - type: gossip-node3
-      count: 1
     phases:
-      - name: generate-topology
-        system:
+      - name: generate-topology # generate topologies
+        tasks:
           - type: topology-generator
-      - name: send-messages
+      - name: gossiping # spin up 4 gossip nodes
+        system:
+          - name: gossip-node0
+            type: gossip-node0
+            count: 1
+          - name: gossip-node1
+            type: gossip-node1
+            count: 1
+          - name: gossip-node2
+            type: gossip-node2
+            count: 1
+          - name: gossip-node3
+            type: gossip-node3
+            count: 1
+      - name: send-messages # add in orchestra node
         system:
           - type: orchestra-node
             count: 1
         tasks:
-          - type: gossip-send-messages
+          - type: gossip-send-messages # TODO -- this task must be defined in task-runners
             timeout: 5 m
