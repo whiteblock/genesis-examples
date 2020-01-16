@@ -6,9 +6,9 @@ services:
       memory: 500 MB
       storage: 1 GiB
     input-files:
-      - source-path: index.html
+      - source-path: html/index.html
         destination-path: /usr/share/nginx/html/index.html
-      - source-path: other.html
+      - source-path: html/other.html
         destination-path: /usr/share/nginx/html/other.html
 task-runners:
   - name: wait-10-minutes
