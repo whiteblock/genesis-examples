@@ -21,7 +21,7 @@ services:
       - source-path: start.sh
         destination-path: /go-libp2p-pubsub-benchmark-tools/start.sh
     script:
-      inline: ./start.sh
+      inline: cp /topology/peers_0.txt /go-libp2p-pubsub-benchmark-tools/peers.txt && ./start.sh
   - name: gossip-node1
     image: "gcr.io/whiteblock/gossipsub:master"
     volumes:
@@ -44,7 +44,7 @@ services:
       - source-path: start.sh
         destination-path: /go-libp2p-pubsub-benchmark-tools/start.sh
     script:
-      inline: ./start.sh
+      inline: cp /topology/peers_1.txt /go-libp2p-pubsub-benchmark-tools/peers.txt && ./start.sh
   - name: gossip-node2
     image: "gcr.io/whiteblock/gossipsub:master"
     volumes:
@@ -67,7 +67,7 @@ services:
       - source-path: start.sh
         destination-path: /go-libp2p-pubsub-benchmark-tools/start.sh
     script:
-      inline: ./start.sh
+      inline: cp /topology/peers_2.txt /go-libp2p-pubsub-benchmark-tools/peers.txt && ./start.sh
   - name: gossip-node3
     image: "gcr.io/whiteblock/gossipsub:master"
     volumes:
@@ -90,7 +90,7 @@ services:
       - source-path: start.sh
         destination-path: /go-libp2p-pubsub-benchmark-tools/start.sh
     script:
-      inline: ./start.sh
+      inline: cp /topology/peers_3.txt /go-libp2p-pubsub-benchmark-tools/peers.txt && ./start.sh
   - name: orchestra-node
     image: "gcr.io/whiteblock/gossipsub:master"
     volumes:
@@ -111,9 +111,7 @@ services:
       - source-path: ./configs/config.json
         destination-path: /go-libp2p-pubsub-benchmark-tools/configs/orchestra/config.json
     script:
-      # this was `ls` before because all containers needs to be created before orchestra can be run.
-      # inline: ls
-      inline: ./orchestra.sh
+      inline: sleep 30 && ./orchestra.sh
 task-runners:
   - name: topology-generator
     # image has to include and build the packages that will be necessary to run the helper
