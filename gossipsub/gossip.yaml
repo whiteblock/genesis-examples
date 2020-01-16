@@ -2,8 +2,9 @@ services:
   - name: gossip-node0
     image: "gcr.io/whiteblock/gossipsub:master"
     volumes:
-      - name: gossip-logs
-        path: /output/
+      - name: topologies
+        path: /topology/
+        scope: singleton
     resources:
       cpus: 1
       memory: 4 GB
@@ -24,8 +25,9 @@ services:
   - name: gossip-node1
     image: "gcr.io/whiteblock/gossipsub:master"
     volumes:
-      - name: gossip-logs
-        path: /output/
+      - name: topologies
+        path: /topology/
+        scope: singleton
     resources:
       cpus: 1
       memory: 4 GB
@@ -46,8 +48,9 @@ services:
   - name: gossip-node2
     image: "gcr.io/whiteblock/gossipsub:master"
     volumes:
-      - name: gossip-logs
-        path: /output/
+      - name: topologies
+        path: /topology/
+        scope: singleton
     resources:
       cpus: 1
       memory: 4 GB
@@ -68,8 +71,9 @@ services:
   - name: gossip-node3
     image: "gcr.io/whiteblock/gossipsub:master"
     volumes:
-      - name: gossip-logs
-        path: /output/
+      - name: topologies
+        path: /topology/
+        scope: singleton
     resources:
       cpus: 1
       memory: 4 GB
@@ -90,8 +94,9 @@ services:
   - name: orchestra-node
     image: "gcr.io/whiteblock/gossipsub:master"
     volumes:
-      - name: gossip-logs
-        path: /output/
+      - name: topologies
+        path: /topology/
+        scope: singleton
     resources:
       cpus: 1
       memory: 4 GB
@@ -116,8 +121,9 @@ task-runners:
     volumes: # stores files peers_*.txt
       - name: topologies
         path: /topology/
+        scope: singleton
     script:
-      inline: python topo.py 42 4 2 true
+      inline: python topo.py 42 4 2 true && mv topology /topology/
   - name: gossip-send-messages # TODO define this task
     script:
       inline: sleep 400
