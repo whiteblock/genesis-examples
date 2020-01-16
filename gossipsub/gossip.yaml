@@ -124,9 +124,6 @@ task-runners:
         scope: singleton
     script:
       inline: python topo.py 42 4 2 true && mv topology /topology/
-  - name: gossip-send-messages # TODO define this task
-    script:
-      inline: sleep 400
 tests:
   - name: gossip-load-test
     description: run a gossip network and send messages
@@ -152,6 +149,3 @@ tests:
         system:
           - type: orchestra-node
             count: 1
-        tasks:
-          - type: gossip-send-messages # TODO -- this task must be defined in task-runners
-            timeout: 5 m
