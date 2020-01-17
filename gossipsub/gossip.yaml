@@ -21,7 +21,7 @@ services:
       - source-path: start.sh
         destination-path: /go-libp2p-pubsub-benchmark-tools/start.sh
     script:
-      inline: cp /topology/peers_0.txt /go-libp2p-pubsub-benchmark-tools/peers.txt && ./start.sh
+      inline: cp /topology/peers_0.txt go-libp2p-pubsub-benchmark-tools/peers.txt && ./start.sh
   - name: gossip-node1
     image: "gcr.io/whiteblock/gossipsub:master"
     volumes:
@@ -93,10 +93,6 @@ services:
       inline: cp /topology/peers_3.txt /go-libp2p-pubsub-benchmark-tools/peers.txt && ./start.sh
   - name: orchestra-node
     image: "gcr.io/whiteblock/gossipsub:master"
-    volumes:
-      - name: topologies
-        path: /topology/
-        scope: singleton
     resources:
       cpus: 1
       memory: 4 GB
@@ -120,8 +116,15 @@ task-runners:
       - name: topologies
         path: /topology/
         scope: singleton
+    resources:
+      cpus: 1
+      memory: 2 GB
+      storage: 512 MB
     script:
-      inline: python topo.py 42 4 2 true && mv topology /topology/
+      inline: python topo.py 42 4 2 true && mv topology/* /topology && sleep 30
+  - name: wait
+    script:
+      inline: sleep 600
 tests:
   - name: gossip-load-test
     description: run a gossip network and send messages
@@ -145,5 +148,9 @@ tests:
             count: 1
       - name: send-messages # add in orchestra node
         system:
-          - type: orchestra-node
+          - name: orchestra-node
+            type: orchestra-node
             count: 1
+      - name: wait
+        tasks:
+        - type: wait
