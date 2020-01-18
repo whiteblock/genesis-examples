@@ -7,7 +7,7 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
         name: staticpeers
         scope: singleton
     script: # if a script is specified here, it will overrun the image's startup command
-      inline: cp /staticpeers/static-nodes.json /geth/geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,db,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --etherbase 0 --unlock 0 --allow-insecure-unlock --password ./geth/pw.txt --mine --minerthreads=1 --ethstats Node1:secret@34.94.253.16:9002
+      inline: cp /staticpeers/static-nodes.json /geth/geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,db,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --etherbase 0 --unlock 0 --allow-insecure-unlock --password ./geth/pw.txt --mine --minerthreads=1 --ethstats Node1:secret@splunk-dev.whiteblock.io:9002
     input-files: # here, specify the files you'd like to include from the start
       - source-path: ./genesis.json # the source-path specified should be relative to the test definition file's location
         destination-path: /geth/genesis.json
@@ -29,7 +29,7 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
         name: staticpeers
         scope: singleton
     script: # if a script is specified here, it will overrun the image's startup command
-      inline: cp /staticpeers/static-nodes.json /geth/geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,db,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --etherbase 0 --unlock 0 --allow-insecure-unlock --password ./geth/pw.txt --mine --minerthreads=1 --ethstats Node2:secret@34.94.253.16:9002
+      inline: cp /staticpeers/static-nodes.json /geth/geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,db,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --etherbase 0 --unlock 0 --allow-insecure-unlock --password ./geth/pw.txt --mine --minerthreads=1 --ethstats Node2:secret@splunk-dev.whiteblock.io:9002
     input-files: # here, specify the files you'd like to include from the start
       - source-path: ./genesis.json # the source-path specified should be relative to the test definition file's location
         destination-path: /geth/genesis.json
@@ -55,7 +55,7 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
       ETH_RPC_URL: "http://geth1-service0:8545"
       NETWORK_NAME: whiteblock
       START_AT_BLOCK: latest
-      SPLUNK_HEC_URL: "http://splunk.whiteblock.io:8088"
+      SPLUNK_HEC_URL: "http://splunk-dev.whiteblock.io:8088"
       SPLUNK_HEC_TOKEN: "11111111-1111-1111-1111-1111111111113"
       SPLUNK_EVENTS_INDEX: main
       SPLUNK_METRICS_INDEX: metrics
@@ -72,7 +72,7 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
       ETH_RPC_URL: "http://geth2-service0:8545"
       NETWORK_NAME: whiteblock
       START_AT_BLOCK: latest
-      SPLUNK_HEC_URL: "http://splunk.whiteblock.io:8088"
+      SPLUNK_HEC_URL: "http://splunk-dev.whiteblock.io:8088"
       SPLUNK_HEC_TOKEN: "11111111-1111-1111-1111-1111111111113"
       SPLUNK_EVENTS_INDEX: main
       SPLUNK_METRICS_INDEX: metrics
