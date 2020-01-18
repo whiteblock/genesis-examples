@@ -1,8 +1,5 @@
 #!/bin/bash -xe
   
-RETRY_DELAY=5
-RETRIES=100
-
 retry_run() {
         n=0
         set -e
@@ -25,24 +22,20 @@ IFS=$'\r\n' GLOBIGNORE='*' command eval  'PEERS=($(cat ./peers.txt))'
 deploy_host() {
   echo "deploying host"
   tmux new -s host -d
-  tmux send-keys -thost "/usr/local/go/bin/go run ./cmd/host/main.go --pem ./pk.pem --log /output.log" C-m
+  tmux send-keys -thost "./cmd/host/host --pem ./pk.pem --log /output.log" C-m
 }
-
-# LINEAR PEERING TOPOLOGY
-# peer() {
-#   echo "peering to: " ${IP[$NODE]} ${MADDR[$NODE]}
-#   retry_run go run ./cmd/client/main.go open-peers /ip4/${IP[$NODE]}/tcp/3000/ipfs/${MADDR[$NODE]}
-# }
 
 peer() {
   for peer in ${PEERS[@]}
-  do
-    retry_run go run ./cmd/client/main.go open-peers /ip4/${IP[peer]}/tcp/3000/ipfs/${MADDR[peer]}
+  do if [ $peer != $SELF ]
+    then retry_run ./cmd/client/client open-peers /ip4/${IP[peer]}/tcp/3000/ipfs/${MADDR[peer]}
+  fi
   done
 }
 
 start() {
   deploy_host
+  sleep 10
   peer
 }
 

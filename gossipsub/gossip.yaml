@@ -1,6 +1,8 @@
 services:
   - name: gossip-node0
     image: "gcr.io/whiteblock/gossipsub:master"
+    environment:
+      SELF: 0
     volumes:
       - name: topologies
         path: /topology/
@@ -8,7 +10,7 @@ services:
     resources:
       cpus: 1
       memory: 4 GB
-      storage: 100 GiB
+      storage: 20 GiB
     input-files:
       - source-path: pems/pk-1.pem
         destination-path: /go-libp2p-pubsub-benchmark-tools/pk.pem
@@ -21,9 +23,11 @@ services:
       - source-path: start.sh
         destination-path: /go-libp2p-pubsub-benchmark-tools/start.sh
     script:
-      inline: cp /topology/peers_0.txt go-libp2p-pubsub-benchmark-tools/peers.txt && ./start.sh
+      inline: cp /topology/peers_0.txt /go-libp2p-pubsub-benchmark-tools/peers.txt && sudo chmod 777 start.sh && ./start.sh && sleep 600
   - name: gossip-node1
     image: "gcr.io/whiteblock/gossipsub:master"
+    environment:
+      SELF: 1
     volumes:
       - name: topologies
         path: /topology/
@@ -31,7 +35,7 @@ services:
     resources:
       cpus: 1
       memory: 4 GB
-      storage: 100 GiB
+      storage: 20 GiB
     input-files:
       - source-path: pems/pk-2.pem
         destination-path: /go-libp2p-pubsub-benchmark-tools/pk.pem
@@ -44,9 +48,11 @@ services:
       - source-path: start.sh
         destination-path: /go-libp2p-pubsub-benchmark-tools/start.sh
     script:
-      inline: cp /topology/peers_1.txt /go-libp2p-pubsub-benchmark-tools/peers.txt && ./start.sh
+      inline: cp /topology/peers_1.txt /go-libp2p-pubsub-benchmark-tools/peers.txt && sudo chmod 777 start.sh && ./start.sh && sleep 600
   - name: gossip-node2
     image: "gcr.io/whiteblock/gossipsub:master"
+    environment:
+      SELF: 2
     volumes:
       - name: topologies
         path: /topology/
@@ -54,7 +60,7 @@ services:
     resources:
       cpus: 1
       memory: 4 GB
-      storage: 100 GiB
+      storage: 20 GiB
     input-files:
       - source-path: pems/pk-3.pem
         destination-path: /go-libp2p-pubsub-benchmark-tools/pk.pem
@@ -70,6 +76,8 @@ services:
       inline: cp /topology/peers_2.txt /go-libp2p-pubsub-benchmark-tools/peers.txt && ./start.sh
   - name: gossip-node3
     image: "gcr.io/whiteblock/gossipsub:master"
+    environment:
+      SELF: 3
     volumes:
       - name: topologies
         path: /topology/
@@ -77,7 +85,7 @@ services:
     resources:
       cpus: 1
       memory: 4 GB
-      storage: 100 GiB
+      storage: 20 GiB
     input-files:
       - source-path: pems/pk-4.pem
         destination-path: /go-libp2p-pubsub-benchmark-tools/pk.pem
@@ -96,7 +104,7 @@ services:
     resources:
       cpus: 1
       memory: 4 GB
-      storage: 100 GiB
+      storage: 20 GiB
     input-files:
       - source-path: NODECOUNT.txt
         destination-path: /go-libp2p-pubsub-benchmark-tools/NODECOUNT.txt
@@ -120,37 +128,55 @@ task-runners:
       cpus: 1
       memory: 2 GB
       storage: 512 MB
-    script:
-      inline: python topo.py 42 4 2 true && mv topology/* /topology && sleep 30
+    script: # need to edit this to output the correct number of files for every node in the network
+      inline: python topo.py 42 2 1 true && mv topology/* /topology
   - name: wait
     script:
-      inline: sleep 600
+      inline: sleep 720
 tests:
   - name: gossip-load-test
+    timeout: infinite
     description: run a gossip network and send messages
     phases:
       - name: generate-topology # generate topologies
         tasks:
           - type: topology-generator
       - name: gossiping # spin up 4 gossip nodes
+        timeout: infinite
         system:
           - name: gossip-node0
             type: gossip-node0
             count: 1
+            resources:
+              networks:
+              - name: gossip-network
           - name: gossip-node1
             type: gossip-node1
             count: 1
-          - name: gossip-node2
-            type: gossip-node2
-            count: 1
-          - name: gossip-node3
-            type: gossip-node3
-            count: 1
-      - name: send-messages # add in orchestra node
+            resources: 
+              networks:
+              - name: gossip-network
+#          - name: gossip-node2
+#            type: gossip-node2
+#            count: 1
+#            resources: 
+#              networks:
+#              - name: gossip-network
+#          - name: gossip-node3
+#            type: gossip-node3
+#            count: 1
+#            resources: 
+#              networks:
+#              - name: gossip-network
+      - name: start-orchestra # add in orchestra node
+        timeout: infinite
         system:
           - name: orchestra-node
             type: orchestra-node
             count: 1
+            resources: 
+              networks:
+              - name: gossip-network
       - name: wait
         tasks:
         - type: wait
