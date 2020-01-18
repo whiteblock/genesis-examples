@@ -7,7 +7,7 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
         name: staticpeers
         scope: singleton
     script: # if a script is specified here, it will overrun the image's startup command
-      inline: cp /staticpeers/static-nodes.json /geth/geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,db,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --etherbase 0 --unlock 0 --allow-insecure-unlock --password ./geth/pw.txt --mine --minerthreads=1 --ethstats Node1:testnet_secret@$ETHSTATS_SERVICE0:3000
+      inline: cp /staticpeers/static-nodes.json /geth/geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,db,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --etherbase 0 --unlock 0 --allow-insecure-unlock --password ./geth/pw.txt --mine --minerthreads=1 --ethstats Node1:secret@34.94.253.16:9002
     input-files: # here, specify the files you'd like to include from the start
       - source-path: ./genesis.json # the source-path specified should be relative to the test definition file's location
         destination-path: /geth/genesis.json
@@ -18,9 +18,9 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
       - source-path: ./keystore/nodekey1
         destination-path: /geth/geth/nodekey
     resources: # specify the resources you'd like to allot to your service
-      cpus: 2
-      memory: 2 GB
-      storage: 5 GiB
+      cpus: 8
+      memory: 8 GB
+      storage: 30 GiB
   - name: geth2 # the name of the service you'd like to test
     description: this service runs the go-ethereum client
     image: "ethereum/client-go:alltools-latest" # specify an image and tag (if no tag is specified, defaults to 'latest')
@@ -29,7 +29,7 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
         name: staticpeers
         scope: singleton
     script: # if a script is specified here, it will overrun the image's startup command
-      inline: cp /staticpeers/static-nodes.json /geth/geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,db,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --etherbase 0 --unlock 0 --allow-insecure-unlock --password ./geth/pw.txt --mine --minerthreads=1 --ethstats Node2:testnet_secret@$ETHSTATS_SERVICE0:3000
+      inline: cp /staticpeers/static-nodes.json /geth/geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,db,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --etherbase 0 --unlock 0 --allow-insecure-unlock --password ./geth/pw.txt --mine --minerthreads=1 --ethstats Node2:secret@34.94.253.16:9002
     input-files: # here, specify the files you'd like to include from the start
       - source-path: ./genesis.json # the source-path specified should be relative to the test definition file's location
         destination-path: /geth/genesis.json
@@ -40,9 +40,9 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
       - source-path: ./keystore/nodekey2
         destination-path: /geth/geth/nodekey
     resources: # specify the resources you'd like to allot to your service
-      cpus: 1
-      memory: 2 GB
-      storage: 5 GiB
+      cpus: 8
+      memory: 8 GB
+      storage: 30 GiB
   - name: ethstats
     image: gcr.io/whiteblock/ethstats:master
     environment:
@@ -53,7 +53,7 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
 task-runners:
   - name: wait
     script:
-      inline: sleep 600
+      inline: sleep 7200
   - name: geth-staticpeers-helper
     description: will gather the IP addresses and generate a static peers file.
     image: "gcr.io/whiteblock/helpers/besu/staticpeers:master"
@@ -80,12 +80,16 @@ tests: # here, specify the tests you'd like to run (a minimum of 1 test is requi
         - name: geth1 # name the service instance
           type: geth1 # the type of service is the `name` of the service you specified in the services array
           count: 1 # the number of instances of this service you'd like to provision for this test
+          port-mappings:
+            - "8545:8545"
           resources: # here, you can modify the resources you've specified for your service before, and you can specify which network(s) you'd like your service to be connected to
             networks: # if a network is not specified, the service will connect to the network called "default"
               - name: common-network
         - name: geth2 # name the service instance
           type: geth2 # the type of service is the `name` of the service you specified in the services array
           count: 1 # the number of instances of this service you'd like to provision for this test
+          port-mappings:
+            - "8545:8545"
           resources: # here, you can modify the resources you've specified for your service before, and you can specify which network(s) you'd like your service to be connected to
             networks: # if a network is not specified, the service will connect to the network called "default"
               - name: common-network
@@ -100,3 +104,4 @@ tests: # here, specify the tests you'd like to run (a minimum of 1 test is requi
       - name: wait
         tasks: 
         - type: wait
+          timeout: 7200s
