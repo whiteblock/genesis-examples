@@ -43,13 +43,43 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
       cpus: 8
       memory: 8 GB
       storage: 30 GiB
-  - name: ethstats
-    image: gcr.io/whiteblock/ethstats:master
+
+
+  - name: splunk1
+    image: gcr.io/whiteblock/splunk:latest
+    resources: # specify the resources you'd like to allot to your service
+      cpus: 2
+      memory: 4 GB
+      storage: 30 GiB
     environment:
-      HOST: "0.0.0.0"
-    input-files:
-      - source-path: ws_secret.json
-        destination-path: /eth-netstats/ws_secret.json
+      ETH_RPC_URL: "http://geth1-service0:8545"
+      NETWORK_NAME: whiteblock
+      START_AT_BLOCK: latest
+      SPLUNK_HEC_URL: "http://splunk.whiteblock.io:8088"
+      SPLUNK_HEC_TOKEN: "11111111-1111-1111-1111-1111111111113"
+      SPLUNK_EVENTS_INDEX: main
+      SPLUNK_METRICS_INDEX: metrics
+      SPLUNK_INTERNAL_INDEX: metrics
+      SPLUNK_HEC_REJECT_INVALID_CERTS: "false"
+
+  - name: splunk2
+    image: gcr.io/whiteblock/splunk:latest
+    resources: # specify the resources you'd like to allot to your service
+      cpus: 2
+      memory: 4 GB
+      storage: 30 GiB
+    environment:
+      ETH_RPC_URL: "http://geth2-service0:8545"
+      NETWORK_NAME: whiteblock
+      START_AT_BLOCK: latest
+      SPLUNK_HEC_URL: "http://splunk.whiteblock.io:8088"
+      SPLUNK_HEC_TOKEN: "11111111-1111-1111-1111-1111111111113"
+      SPLUNK_EVENTS_INDEX: main
+      SPLUNK_METRICS_INDEX: metrics
+      SPLUNK_INTERNAL_INDEX: metrics
+      SPLUNK_HEC_REJECT_INVALID_CERTS: "false"
+
+
 task-runners:
   - name: wait
     script:
@@ -93,14 +123,16 @@ tests: # here, specify the tests you'd like to run (a minimum of 1 test is requi
           resources: # here, you can modify the resources you've specified for your service before, and you can specify which network(s) you'd like your service to be connected to
             networks: # if a network is not specified, the service will connect to the network called "default"
               - name: common-network
-        - name: ethstats
-          type: ethstats
-          count: 1
-          port-mappings:
-            - "80:3000"
-          resources: 
-              networks:
-                - name: common-network
+
+        - type: splunk1 
+          resources: # here, you can modify the resources you've specified for your service before, and you can specify which network(s) you'd like your service to be connected to
+            networks: # if a network is not specified, the service will connect to the network called "default"
+              - name: common-network
+        - type: splunk2 
+          resources: # here, you can modify the resources you've specified for your service before, and you can specify which network(s) you'd like your service to be connected to
+            networks: # if a network is not specified, the service will connect to the network called "default"
+              - name: common-network
+        
       - name: wait
         tasks: 
         - type: wait
