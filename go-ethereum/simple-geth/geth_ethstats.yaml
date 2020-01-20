@@ -7,7 +7,7 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
         name: staticpeers
         scope: singleton
     script: # if a script is specified here, it will overrun the image's startup command
-      inline: cp /staticpeers/static-nodes.json /geth/geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,db,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --etherbase 0 --unlock 0 --allow-insecure-unlock --password ./geth/pw.txt --mine --minerthreads=1 --ethstats Node1:secret@splunk-dev.whiteblock.io:9002
+      inline: cp /staticpeers/static-nodes.json /geth/geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,db,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --etherbase 0 --unlock 0 --allow-insecure-unlock --password ./geth/pw.txt --mine --minerthreads=1 --ethstats $NAME:secret@splunk.whiteblock.io:9002
     input-files: # here, specify the files you'd like to include from the start
       - source-path: ./genesis.json # the source-path specified should be relative to the test definition file's location
         destination-path: /geth/genesis.json
@@ -29,7 +29,7 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
         name: staticpeers
         scope: singleton
     script: # if a script is specified here, it will overrun the image's startup command
-      inline: cp /staticpeers/static-nodes.json /geth/geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,db,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --etherbase 0 --unlock 0 --allow-insecure-unlock --password ./geth/pw.txt --mine --minerthreads=1 --ethstats Node2:secret@splunk-dev.whiteblock.io:9002
+      inline: cp /staticpeers/static-nodes.json /geth/geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,db,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --etherbase 0 --unlock 0 --allow-insecure-unlock --password ./geth/pw.txt --mine --minerthreads=1 --ethstats $NAME:secret@splunk.whiteblock.io:9002
     input-files: # here, specify the files you'd like to include from the start
       - source-path: ./genesis.json # the source-path specified should be relative to the test definition file's location
         destination-path: /geth/genesis.json
@@ -44,8 +44,11 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
       memory: 8 GB
       storage: 30 GiB
 
-
-  - name: splunk1
+sidecars:
+  - name: splunk
+    sidecar-to:
+      - geth1
+      - geth2
     image: gcr.io/whiteblock/splunk:latest
     resources: # specify the resources you'd like to allot to your service
       cpus: 2
@@ -53,37 +56,16 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
       storage: 30 GiB
     script:
       inline:
-        ethlogger --eth-rpc-url=http://$GETH1_SERVICE0_COMMON_NETWORK:8545
+        ethlogger --eth-rpc-url=http://$SERVICE:8545
     environment:
       NETWORK_NAME: whiteblock
       START_AT_BLOCK: latest
-      SPLUNK_HEC_URL: "https://splunk-dev.whiteblock.io:8088"
-      SPLUNK_HEC_TOKEN: "e0d2b1c9-a96b-4977-987e-62e9add3fbb2"
+      SPLUNK_HEC_URL: "https://splunk.whiteblock.io:8088"
+      SPLUNK_HEC_TOKEN: "f57efd39-f84d-470d-ae0e-ff0f67ee98c7"
       SPLUNK_EVENTS_INDEX: main
       SPLUNK_METRICS_INDEX: metrics
       SPLUNK_INTERNAL_INDEX: metrics
       SPLUNK_HEC_REJECT_INVALID_CERTS: "false"
-
-  - name: splunk2
-    image: gcr.io/whiteblock/splunk:latest
-    resources: # specify the resources you'd like to allot to your service
-      cpus: 2
-      memory: 4 GB
-      storage: 30 GiB
-    script:
-      inline:
-        ethlogger --eth-rpc-url=http://$GETH2_SERVICE0_COMMON_NETWORK:8545
-    environment:
-      ETH_RPC_URL: "http://geth2-service0:8545"
-      NETWORK_NAME: whiteblock
-      START_AT_BLOCK: latest
-      SPLUNK_HEC_URL: "https://splunk-dev.whiteblock.io:8088"
-      SPLUNK_HEC_TOKEN: "e0d2b1c9-a96b-4977-987e-62e9add3fbb2"
-      SPLUNK_EVENTS_INDEX: main
-      SPLUNK_METRICS_INDEX: metrics
-      SPLUNK_INTERNAL_INDEX: metrics
-      SPLUNK_HEC_REJECT_INVALID_CERTS: "false"
-
 
 task-runners:
   - name: wait
@@ -128,16 +110,6 @@ tests: # here, specify the tests you'd like to run (a minimum of 1 test is requi
           resources: # here, you can modify the resources you've specified for your service before, and you can specify which network(s) you'd like your service to be connected to
             networks: # if a network is not specified, the service will connect to the network called "default"
               - name: common-network
-
-        - type: splunk1 
-          resources: # here, you can modify the resources you've specified for your service before, and you can specify which network(s) you'd like your service to be connected to
-            networks: # if a network is not specified, the service will connect to the network called "default"
-              - name: common-network
-        - type: splunk2 
-          resources: # here, you can modify the resources you've specified for your service before, and you can specify which network(s) you'd like your service to be connected to
-            networks: # if a network is not specified, the service will connect to the network called "default"
-              - name: common-network
-        
       - name: wait
         tasks: 
         - type: wait
