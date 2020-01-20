@@ -208,7 +208,7 @@ tests:
             count: 1
             port-mappings:
               - "30305:30303"
-              - "8547:8545"
+              - "8549:8545"
             resources:
               networks:
                 - name: quorum-network
@@ -217,7 +217,7 @@ tests:
             count: 1
             port-mappings:
               - "30305:30303"
-              - "8547:8545"
+              - "8550:8545"
             resources:
               networks:
                 - name: quorum-network
@@ -226,7 +226,7 @@ tests:
             count: 1
             port-mappings:
               - "30305:30303"
-              - "8547:8545"
+              - "8551:8545"
             resources:
               networks:
                 - name: quorum-network
