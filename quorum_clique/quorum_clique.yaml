@@ -22,7 +22,7 @@ services:
       - source-path: passwords.txt
         destination-path: /data/passwords.txt
     script:
-      inline: geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats Node1:eea_testnet_secret@ethstats-service0:3000 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum | tee /output/output.log 2>&1                      
+      inline: geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats $NAME:secret@splunk.whiteblock.io:9002 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum | tee /output/output.log 2>&1                      
   - name: Quorum2
     image: quorumengineering/quorum:2.2.5
     volumes:
@@ -46,7 +46,7 @@ services:
       - source-path: passwords.txt
         destination-path: /data/passwords.txt
     script:
-      inline: geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats Node2:eea_testnet_secret@ethstats-service0:3000 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum | tee /output/output.log 2>&1                        
+      inline: geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats $NAME:secret@splunk.whiteblock.io:9002 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum | tee /output/output.log 2>&1                        
   - name: Quorum3
     image: quorumengineering/quorum:2.2.5
     volumes:
@@ -70,7 +70,7 @@ services:
       - source-path: passwords.txt
         destination-path: /data/passwords.txt
     script:
-      inline: geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats Node3:eea_testnet_secret@ethstats-service0:3000 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum | tee /output/output.log 2>&1   
+      inline: geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats $NAME:secret@splunk.whiteblock.io:9002 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum | tee /output/output.log 2>&1   
   - name: Quorum4
     image: quorumengineering/quorum:2.2.5
     volumes:
@@ -94,7 +94,7 @@ services:
       - source-path: passwords.txt
         destination-path: /data/passwords.txt
     script:
-      inline: geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats Node4:eea_testnet_secret@ethstats-service0:3000 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum | tee /output/output.log 2>&1   
+      inline: geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats $NAME:secret@splunk.whiteblock.io:9002 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum | tee /output/output.log 2>&1   
   - name: Quorum5
     image: quorumengineering/quorum:2.2.5
     volumes:
@@ -118,7 +118,7 @@ services:
       - source-path: passwords.txt
         destination-path: /data/passwords.txt
     script:
-      inline: geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats Node5:eea_testnet_secret@ethstats-service0:3000 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum | tee /output/output.log 2>&1
+      inline: geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats $NAME:secret@splunk.whiteblock.io:9002 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum | tee /output/output.log 2>&1
   - name: Quorum6
     image: quorumengineering/quorum:2.2.5
     volumes:
@@ -142,7 +142,7 @@ services:
       - source-path: passwords.txt
         destination-path: /data/passwords.txt
     script:
-      inline: geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats Node6:eea_testnet_secret@ethstats-service0:3000 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum | tee /output/output.log 2>&1
+      inline: geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats $NAME:secret@splunk.whiteblock.io:9002 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum | tee /output/output.log 2>&1
   - name: Quorum7
     image: quorumengineering/quorum:2.2.5
     volumes:
@@ -166,18 +166,35 @@ services:
       - source-path: passwords.txt
         destination-path: /data/passwords.txt
     script:
-      inline: geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats Node7:eea_testnet_secret@ethstats-service0:3000 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum | tee /output/output.log 2>&1
-  - name: ethstats
-    image: gcr.io/whiteblock/ethstats:master
-    environment:
-      HOST: "0.0.0.0"
-    input-files:
-      - source-path: ws_secret.json
-        destination-path: /eth-netstats/ws_secret.json     
-task-runners:
-  - name: testnet-expiration
+      inline: geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats $NAME:secret@splunk.whiteblock.io:9002 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum | tee /output/output.log 2>&1
+sidecars:
+  - name: splunk
+    sidecar-to:
+      - Quorum1
+      - Quorum2
+      - Quorum3
+      - Quorum4
+      - Quorum5
+      - Quorum6
+      - Quorum7
+    image: gcr.io/whiteblock/splunk:latest
+    resources:
+      cpus: 2
+      memory: 4 GB
+      storage: 30 GiB
     script:
-      inline: sleep 7200    
+      inline:
+        ethlogger --eth-rpc-url=http://$SERVICE:8545
+    environment:
+      NETWORK_NAME: quorem
+      START_AT_BLOCK: latest
+      SPLUNK_HEC_URL: "https://splunk.whiteblock.io:8088"
+      SPLUNK_HEC_TOKEN: "019489a6-f9f2-45b4-8d50-3f22d56f4b09"
+      SPLUNK_EVENTS_INDEX: main
+      SPLUNK_METRICS_INDEX: metrics
+      SPLUNK_INTERNAL_INDEX: metrics
+      SPLUNK_HEC_REJECT_INVALID_CERTS: "false"
+
 tests:
   - name: testnet
     timeout: infinite
@@ -236,13 +253,6 @@ tests:
         port-mappings:
           - "30308:30303"
           - "8551:8545"
-        resources: 
-            networks:
-              - name: quorum_network
-      - type: ethstats
-        count: 1
-        port-mappings:
-          - "80:3000"
         resources: 
             networks:
               - name: quorum_network
