@@ -1,0 +1,84 @@
+services:
+  - name: Quorum1
+    image: quorumengineering/quorum:2.2.5
+    volumes:
+      - path: /output/
+        name: eea-logs
+      - path: /staticpeers/
+        name: staticpeers
+        scope: singleton
+    resources:
+      cpus: 4
+      memory: 4 GB
+      storage: 5 GiB
+    input-files:
+      - source-path: ./genesis.json
+        destination-path: /data/genesis.json
+      - source-path: ./quorum_files/key1
+        destination-path: /data/keystore/key1
+      - source-path: ./quorum_files/nodekey1
+        destination-path: /data/nodekey
+      - source-path: ./quorum_files/passwords.txt
+        destination-path: /data/passwords.txt
+    script:
+      inline: cp /staticpeers/static-nodes.json /data/static-nodes.json && cp /staticpeers/static-nodes.json /data/permissioned-nodes.json && geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum  --verbosity 3 | tee /output/output.log 2>&1
+  - name: Besu1
+    image: "hyperledger/besu:develop"
+    script:
+      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE
+    input-files:
+      - source-path: ./genesis.json
+        destination-path: /var/lib/besu/genesis.json
+      - source-path: ./besu_files/pk1
+        destination-path: /var/lib/besu/key
+    volumes:
+      - path: /staticpeers/
+        name: staticpeers
+        scope: singleton
+    resources:
+      cpus: 2
+      memory: 3 GB
+      storage: 5 GiB
+task-runners:
+  - name: static-peers # generate static peers for besu
+    image: "gcr.io/whiteblock/helpers/besu/staticpeers:master"
+    volumes:
+      - path: /staticpeers/
+        name: staticpeers
+        scope: singleton
+    script:
+      inline:  ./besuStaticPeers generate -a '[{"publicKey":"ac6b1096ca56b9f6d004b779ae3728bf83f8e22453404cc3cef16a3d9b96608bc67c4b30db88e0a5a6c6390213f7acbe1153ff6d23ce57380104288ae19373ef"},{"publicKey":"b0ec8003f44030987b8c994e06bd6517183ef633f35ce6f65af90a68d524ca64b8670044d633f9ab4c57291a2a3df2437664061759f809e735628db10b07803b"}]' --ip '["'$QUORUM1_SERVICE0_QUORUM_NETWORK'","'$BESU1_SERVICE0_QUORUM_NETWORK'"]' >> /staticpeers/static-nodes.json
+  - name: testnet-expiration
+    script:
+      inline: sleep 7200
+tests:
+  - name: testnet
+    description: run an EEA-Besu testnet and execute some simple transactions
+    phases:
+      - name: generate-static-peers
+        tasks:
+          - type: static-peers
+            timeout: 2 m
+      - name: run-testnet
+        system:
+          - type: Quorum1
+            count: 1
+            port-mappings:
+              - "30303:30303"
+              - "8545:8545"
+            resources:
+              networks:
+                - name: quorum_network
+          - name: Besu1
+            type: Besu1
+            count: 1
+            port-mappings:
+              - "30305:30303"
+              - "8549:8545"
+            resources:
+              networks:
+                - name: quorum-network
+      - name: testnet-expiration
+        tasks:
+          - type: testnet-expiration
+            timeout: 7200s
