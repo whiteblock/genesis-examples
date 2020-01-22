@@ -59,7 +59,7 @@ tests:
         tasks:
           - type: static-peers
             timeout: 2 m
-      - name: run-testnet
+      - name: run-nodes
         system:
           - type: Quorum1
             count: 1

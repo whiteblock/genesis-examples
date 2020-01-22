@@ -29,7 +29,7 @@
     "isQuorum": true,
     "clique": {
       "period": 5,
-      "epoch": 30000
+      "epoch": 5000
     }
   },
   "difficulty": "0x0",
