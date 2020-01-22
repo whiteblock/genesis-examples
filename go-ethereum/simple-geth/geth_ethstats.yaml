@@ -43,7 +43,6 @@ services:
       cpus: 8
       memory: 8 GB
       storage: 30 GiB
-
 sidecars:
   - name: splunk
     sidecar-to:
@@ -66,11 +65,10 @@ sidecars:
       SPLUNK_METRICS_INDEX: metrics
       SPLUNK_INTERNAL_INDEX: metrics
       SPLUNK_HEC_REJECT_INVALID_CERTS: "false"
-
 task-runners:
   - name: wait
     script:
-      inline: sleep 7200
+      inline: sleep 6000
   - name: geth-staticpeers-helper
     description: will gather the IP addresses and generate a static peers file.
     image: "gcr.io/whiteblock/helpers/besu/staticpeers:master"
@@ -113,4 +111,4 @@ tests:
       - name: wait
         tasks: 
         - type: wait
-          timeout: 7200s
+          timeout: 6000s

@@ -166,7 +166,7 @@ services:
       - source-path: passwords.txt
         destination-path: /data/passwords.txt
     script:
-      inline: geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats $NAME:secret@splunk.whiteblock.io:9002 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum | tee /output/output.log 2>&1
+      inline: geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats $NAME:secret@splunk.whiteblock.io:9002 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum 
 sidecars:
   - name: splunk
     sidecar-to:
@@ -186,7 +186,7 @@ sidecars:
       inline:
         ethlogger --eth-rpc-url=http://$SERVICE:8545
     environment:
-      NETWORK_NAME: quorem
+      NETWORK_NAME: quorum
       START_AT_BLOCK: latest
       SPLUNK_HEC_URL: "https://splunk.whiteblock.io:8088"
       SPLUNK_HEC_TOKEN: "019489a6-f9f2-45b4-8d50-3f22d56f4b09"
@@ -198,7 +198,7 @@ sidecars:
 tests:
   - name: testnet
     timeout: infinite
-    description: run an EEA testnet and execute some simple transactions
+    description: run an Quorum testnet and execute some simple transactions
     system:
       - type: Quorum1
         count: 1
