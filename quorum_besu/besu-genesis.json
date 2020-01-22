@@ -27,8 +27,8 @@
     "eip150Hash": "0x0000000000000000000000000000000000000000000000000000000000000000",
     "eip158Block": 0,
     "clique": {
-      "period": 5,
-      "epoch": 5000
+      "blockperiodseconds": 5,
+      "epochLength": 5000
     }
   },
   "difficulty": "0x0",
