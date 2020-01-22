@@ -20,8 +20,8 @@ services:
         destination-path: /data/nodekey
       - source-path: ./quorum_files/passwords.txt
         destination-path: /data/passwords.txt
-    script:
-      inline: cp /staticpeers/static-nodes.json /data/static-nodes.json && cp /staticpeers/static-nodes.json /data/permissioned-nodes.json && geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum  --verbosity 3
+    script: #TODO add nodiscover
+      inline: cp /staticpeers/static-nodes.json /data/static-nodes.json && cp /staticpeers/static-nodes.json /data/permissioned-nodes.json && geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --syncmode full --nodiscover --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum  --verbosity 6
   - name: Besu1
     image: "hyperledger/besu:develop"
     script:
