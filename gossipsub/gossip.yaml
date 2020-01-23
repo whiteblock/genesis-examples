@@ -134,7 +134,6 @@ tests:
         tasks:
           - type: topology-generator
       - name: gossiping # spin up gossip nodes
-        timeout: infinite
         system:
           - name: gossip-node0
             type: gossip-node0
@@ -162,8 +161,8 @@ tests:
               - name: gossip-network
         tasks:
         - type: init
+          timeout: infinite
       - name: start-orchestra # add in orchestra node
-        timeout: infinite
         system:
           - name: orchestra-node
             type: orchestra-node
@@ -173,3 +172,4 @@ tests:
               - name: gossip-network
         tasks:
         -  type: run
+           timeout: infinite
