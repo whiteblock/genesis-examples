@@ -2,8 +2,6 @@ services:
   - name: Quorum1
     image: quorumengineering/quorum:2.2.5
     volumes:
-      - path: /output/
-        name: eea-logs
       - path: /staticpeers/
         name: staticpeers
         scope: singleton
@@ -25,8 +23,6 @@ services:
   - name: Quorum2
     image: quorumengineering/quorum:2.2.5
     volumes:
-      - path: /output/
-        name: eea-logs
       - path: /staticpeers/
         name: staticpeers
         scope: singleton
@@ -48,8 +44,6 @@ services:
   - name: Quorum3
     image: quorumengineering/quorum:2.2.5
     volumes:
-      - path: /output/
-        name: eea-logs
       - path: /staticpeers/
         name: staticpeers
         scope: singleton
@@ -71,8 +65,6 @@ services:
   - name: Quorum4
     image: quorumengineering/quorum:2.2.5
     volumes:
-      - path: /output/
-        name: eea-logs
       - path: /staticpeers/
         name: staticpeers
         scope: singleton
