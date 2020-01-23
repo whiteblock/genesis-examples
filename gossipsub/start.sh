@@ -20,10 +20,8 @@ IFS=$'\r\n' GLOBIGNORE='*' command eval  'PEERS=($(cat ./peers.txt))'
 # echo ${PEERS[@]:0:COUNT}
 
 deploy_host() {
-#  echo "deploying host"
-#  tmux new -s host -d
-#  tmux send-keys -thost "./cmd/host/host --pem ./pk.pem --log /output.log" C-m
-  ./cmd/host/host --pem ./pk.pem --log /topology/output_$SELF.log
+  ./cmd/host/host --pem ./pk.pem 
+#--log /topology/output_$SELF.log
 }
 
 peer() {

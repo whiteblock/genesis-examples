@@ -101,7 +101,6 @@ services:
       - source-path: config_orchestra.sh
         destination-path: /go-libp2p-pubsub-benchmark-tools/config_orchestra.sh
     script:
-      # inline: sleep 15 && cp /topology/NODECOUNT.txt /go-libp2p-pubsub-benchmark-tools/NODECOUNT.txt && cp /topology/IP.txt /go-libp2p-pubsub-benchmark-tools/IP.txt && sudo chmod 777 ./orchestra.sh && sleep 60
      inline: sleep 15 && cp /topology/NODECOUNT.txt /go-libp2p-pubsub-benchmark-tools/NODECOUNT.txt && cp /topology/IP.txt /go-libp2p-pubsub-benchmark-tools/IP.txt && sudo chmod 777 ./config_orchestra.sh && ./config_orchestra.sh && sudo chmod 777 ./orchestra.sh && ./orchestra.sh && sleep 120
 task-runners:
   - name: topology-generator
@@ -119,7 +118,7 @@ task-runners:
       memory: 2 GB
       storage: 512 MB
     script: # need to edit this to output the correct number of files for every node in the network
-      inline: python topo.py 42 2 1 true && mv topology/* /topology && bash getIP.sh && mv NODECOUNT.txt /topology && mv IP.txt /topology && sleep 15
+      inline: python topo.py 42 4 2 true && mv topology/* /topology && bash getIP.sh && mv NODECOUNT.txt /topology && mv IP.txt /topology && sleep 15
   - name: init
     script:
       inline: sleep 15
@@ -149,18 +148,18 @@ tests:
             resources: 
               networks:
               - name: gossip-network
-#          - name: gossip-node2
-#            type: gossip-node2
-#            count: 1
-#            resources: 
-#              networks:
-#              - name: gossip-network
-#          - name: gossip-node3
-#            type: gossip-node3
-#            count: 1
-#            resources: 
-#              networks:
-#              - name: gossip-network
+          - name: gossip-node2
+            type: gossip-node2
+            count: 1
+            resources: 
+              networks:
+              - name: gossip-network
+          - name: gossip-node3
+            type: gossip-node3
+            count: 1
+            resources: 
+              networks:
+              - name: gossip-network
         tasks:
         - type: init
       - name: start-orchestra # add in orchestra node

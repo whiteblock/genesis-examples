@@ -26,7 +26,8 @@ check() {
 }
 
 send() {
-  ./cmd/orchestra/orchestra start --log /topology/orchestra_output.log
+  ./cmd/orchestra/orchestra start
+# --log /topology/orchestra_output.log
 }
 
 check
