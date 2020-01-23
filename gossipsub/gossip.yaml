@@ -1,145 +1,176 @@
 services:
   - name: gossip-node0
-    image: gcr.io/whiteblock/gossipsub
-    shared-volumes:
-      - source-path: /output/
-        name: gossip-logs
+    image: "gcr.io/whiteblock/gossipsub:master"
+    environment:
+      SELF: 0
+    volumes:
+      - name: topologies
+        path: /topology/
+        scope: singleton
     resources:
       cpus: 1
       memory: 4 GB
-      storage: 100 GiB
+      storage: 20 GiB
     input-files:
       - source-path: pems/pk-1.pem
         destination-path: /go-libp2p-pubsub-benchmark-tools/pk.pem
-      - source-path: NODECOUNT.txt
-        destination-path: /go-libp2p-pubsub-benchmark-tools/NODECOUNT.txt
-      - source-path: IP.txt
-        destination-path: /go-libp2p-pubsub-benchmark-tools/IP.txt
       - source-path: MADDR.txt
         destination-path: /go-libp2p-pubsub-benchmark-tools/MADDR.txt
       - source-path: start.sh
         destination-path: /go-libp2p-pubsub-benchmark-tools/start.sh
     script:
-      inline: ./start.sh
+      inline: cp /topology/peers_0.txt /go-libp2p-pubsub-benchmark-tools/peers.txt && cp /topology/NODECOUNT.txt /go-libp2p-pubsub-benchmark-tools/NODECOUNT.txt && cp /topology/IP.txt /go-libp2p-pubsub-benchmark-tools/IP.txt && sudo chmod 777 start.sh && ./start.sh
   - name: gossip-node1
-    image: gcr.io/whiteblock/gossipsub
-    shared-volumes:
-      - source-path: /output/
-        name: gossip-logs
+    image: "gcr.io/whiteblock/gossipsub:master"
+    environment:
+      SELF: 1
+    volumes:
+      - name: topologies
+        path: /topology/
+        scope: singleton
     resources:
       cpus: 1
       memory: 4 GB
-      storage: 100 GiB
+      storage: 20 GiB
     input-files:
       - source-path: pems/pk-2.pem
         destination-path: /go-libp2p-pubsub-benchmark-tools/pk.pem
-      - source-path: NODECOUNT.txt
-        destination-path: /go-libp2p-pubsub-benchmark-tools/NODECOUNT.txt
-      - source-path: IP.txt
-        destination-path: /go-libp2p-pubsub-benchmark-tools/IP.txt
       - source-path: MADDR.txt
         destination-path: /go-libp2p-pubsub-benchmark-tools/MADDR.txt
       - source-path: start.sh
         destination-path: /go-libp2p-pubsub-benchmark-tools/start.sh
     script:
-      inline: ./start.sh
+      inline: cp /topology/peers_1.txt /go-libp2p-pubsub-benchmark-tools/peers.txt && cp /topology/NODECOUNT.txt /go-libp2p-pubsub-benchmark-tools/NODECOUNT.txt && cp /topology/IP.txt /go-libp2p-pubsub-benchmark-tools/IP.txt && sudo chmod 777 start.sh && ./start.sh
   - name: gossip-node2
-    image: gcr.io/whiteblock/gossipsub
-    shared-volumes:
-      - source-path: /output/
-        name: gossip-logs
+    image: "gcr.io/whiteblock/gossipsub:master"
+    environment:
+      SELF: 2
+    volumes:
+      - name: topologies
+        path: /topology/
+        scope: singleton
     resources:
       cpus: 1
       memory: 4 GB
-      storage: 100 GiB
+      storage: 20 GiB
     input-files:
       - source-path: pems/pk-3.pem
         destination-path: /go-libp2p-pubsub-benchmark-tools/pk.pem
-      - source-path: NODECOUNT.txt
-        destination-path: /go-libp2p-pubsub-benchmark-tools/NODECOUNT.txt
-      - source-path: IP.txt
-        destination-path: /go-libp2p-pubsub-benchmark-tools/IP.txt
       - source-path: MADDR.txt
         destination-path: /go-libp2p-pubsub-benchmark-tools/MADDR.txt
       - source-path: start.sh
         destination-path: /go-libp2p-pubsub-benchmark-tools/start.sh
     script:
-      inline: ./start.sh
+      inline: cp /topology/peers_2.txt /go-libp2p-pubsub-benchmark-tools/peers.txt && cp /topology/NODECOUNT.txt /go-libp2p-pubsub-benchmark-tools/NODECOUNT.txt && cp /topology/IP.txt /go-libp2p-pubsub-benchmark-tools/IP.txt && sudo chmod 777 start.sh && ./start.sh && sleep 600
   - name: gossip-node3
-    image: gcr.io/whiteblock/gossipsub
-    shared-volumes:
-      - source-path: /output/
-        name: gossip-logs
+    image: "gcr.io/whiteblock/gossipsub:master"
+    environment:
+      SELF: 3
+    volumes:
+      - name: topologies
+        path: /topology/
+        scope: singleton
     resources:
       cpus: 1
       memory: 4 GB
-      storage: 100 GiB
+      storage: 20 GiB
     input-files:
       - source-path: pems/pk-4.pem
         destination-path: /go-libp2p-pubsub-benchmark-tools/pk.pem
-      - source-path: NODECOUNT.txt
-        destination-path: /go-libp2p-pubsub-benchmark-tools/NODECOUNT.txt
-      - source-path: IP.txt
-        destination-path: /go-libp2p-pubsub-benchmark-tools/IP.txt
       - source-path: MADDR.txt
         destination-path: /go-libp2p-pubsub-benchmark-tools/MADDR.txt
       - source-path: start.sh
         destination-path: /go-libp2p-pubsub-benchmark-tools/start.sh
     script:
-      inline: ./start.sh
+      inline: cp /topology/peers_3.txt /go-libp2p-pubsub-benchmark-tools/peers.txt && cp /topology/NODECOUNT.txt /go-libp2p-pubsub-benchmark-tools/NODECOUNT.txt && cp /topology/IP.txt /go-libp2p-pubsub-benchmark-tools/IP.txt && sudo chmod 777 start.sh && ./start.sh && sleep 600
   - name: orchestra-node
-    image: gcr.io/whiteblock/gossipsub
-    shared-volumes:
-      - source-path: /output/
-        name: gossip-logs
+    image: "gcr.io/whiteblock/gossipsub:master"
+    volumes:
+      - name: topologies
+        path: /topology/
+        scope: singleton
     resources:
       cpus: 1
       memory: 4 GB
-      storage: 100 GiB
+      storage: 20 GiB
     input-files:
-      - source-path: NODECOUNT.txt
-        destination-path: /go-libp2p-pubsub-benchmark-tools/NODECOUNT.txt
-      - source-path: IP.txt
-        destination-path: /go-libp2p-pubsub-benchmark-tools/IP.txt
       - source-path: orchestra.sh
         destination-path: /go-libp2p-pubsub-benchmark-tools/orchestra.sh
       - source-path: ./configs/config.json
         destination-path: /go-libp2p-pubsub-benchmark-tools/configs/orchestra/config.json
+      - source-path: config_orchestra.sh
+        destination-path: /go-libp2p-pubsub-benchmark-tools/config_orchestra.sh
     script:
-      # this was `ls` before because all containers needs to be created before orchestra can be run.
-      # inline: ls
-      inline: ./orchestra.sh
+      # inline: sleep 15 && cp /topology/NODECOUNT.txt /go-libp2p-pubsub-benchmark-tools/NODECOUNT.txt && cp /topology/IP.txt /go-libp2p-pubsub-benchmark-tools/IP.txt && sudo chmod 777 ./orchestra.sh && sleep 60
+     inline: sleep 15 && cp /topology/NODECOUNT.txt /go-libp2p-pubsub-benchmark-tools/NODECOUNT.txt && cp /topology/IP.txt /go-libp2p-pubsub-benchmark-tools/IP.txt && sudo chmod 777 ./config_orchestra.sh && ./config_orchestra.sh && sudo chmod 777 ./orchestra.sh && ./orchestra.sh && sleep 120
 task-runners:
   - name: topology-generator
     # image has to include and build the packages that will be necessary to run the helper
-    image: gcr.io/whiteblock/helpers/topologygen
-    output-files:
-      - /topology/peers_0.txt
-      - /topology/peers_1.txt
-      - /topology/peers_2.txt
-      - /topology/peers_3.txt
+    image: "gcr.io/whiteblock/helpers/topologygen:master"
+    volumes: # stores files peers_*.txt
+      - name: topologies
+        path: /topology/
+        scope: singleton
+    input-files:
+      - source-path: getIP.sh
+        destination-path: /topologyGen/getIP.sh
+    resources:
+      cpus: 1
+      memory: 2 GB
+      storage: 512 MB
+    script: # need to edit this to output the correct number of files for every node in the network
+      inline: python topo.py 42 2 1 true && mv topology/* /topology && bash getIP.sh && mv NODECOUNT.txt /topology && mv IP.txt /topology && sleep 15
+  - name: init
     script:
-      inline: python topo.py 42 4 2 true
+      inline: sleep 15
+  - name: run
+    script:
+      inline: sleep 750
 tests:
   - name: gossip-load-test
+    timeout: infinite
     description: run a gossip network and send messages
-    system:
-    - type: gossip-node0
-      count: 1
-    - type: gossip-node1
-      count: 1
-    - type: gossip-node2
-      count: 1
-    - type: gossip-node3
-      count: 1
     phases:
-      - name: generate-topology
-        system:
-          - type: topology-generator
-      - name: send-messages
-        system:
-          - type: orchestra-node
-            count: 1
+      - name: generate-topology # generate topologies
         tasks:
-          - type: gossip-send-messages
-            timeout: 5 m
+          - type: topology-generator
+      - name: gossiping # spin up gossip nodes
+        timeout: infinite
+        system:
+          - name: gossip-node0
+            type: gossip-node0
+            count: 1
+            resources:
+              networks:
+              - name: gossip-network
+          - name: gossip-node1
+            type: gossip-node1
+            count: 1
+            resources: 
+              networks:
+              - name: gossip-network
+#          - name: gossip-node2
+#            type: gossip-node2
+#            count: 1
+#            resources: 
+#              networks:
+#              - name: gossip-network
+#          - name: gossip-node3
+#            type: gossip-node3
+#            count: 1
+#            resources: 
+#              networks:
+#              - name: gossip-network
+        tasks:
+        - type: init
+      - name: start-orchestra # add in orchestra node
+        timeout: infinite
+        system:
+          - name: orchestra-node
+            type: orchestra-node
+            count: 1
+            resources: 
+              networks:
+              - name: gossip-network
+        tasks:
+        -  type: run
