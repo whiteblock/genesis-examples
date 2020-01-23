@@ -173,60 +173,39 @@ tests:
         system:
           - type: Quorum1
             count: 1
-            port-mappings:
-              - "30303:30303"
-              - "8545:8545"
             resources:
               networks:
                 - name: quorum-network
           - type: Quorum2
             count: 1
-            port-mappings:
-              - "30304:30303"
-              - "8546:8545"
             resources:
               networks:
                 - name: quorum-network
           - type: Quorum3
             count: 1
-            port-mappings:
-              - "30305:30303"
-              - "8547:8545"
             resources:
               networks:
                 - name: quorum-network
           - type: Quorum4
             count: 1
-            port-mappings:
-              - "30306:30303"
-              - "8548:8545"
             resources:
               networks:
                 - name: quorum-network
           - name: Besu1
             type: Besu1
             count: 1
-            port-mappings:
-              - "30305:30303"
-              - "8549:8545"
             resources:
               networks:
                 - name: quorum-network
           - name: Besu2
             type: Besu2
             count: 1
-            port-mappings:
-              - "30305:30303"
-              - "8550:8545"
             resources:
               networks:
                 - name: quorum-network
           - name: Besu3
             type: Besu3
             count: 1
-            port-mappings:
-              - "30305:30303"
-              - "8551:8545"
             resources:
               networks:
                 - name: quorum-network
