@@ -163,7 +163,7 @@ task-runners:
       inline: sleep 600
 tests:
   - name: testnet
-    description: run an EEA-Besu testnet
+    description: run an Quorum-Besu testnet
     phases:
       - name: generate-static-peers
         tasks:
