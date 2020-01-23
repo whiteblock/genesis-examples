@@ -16,4 +16,4 @@ Helper that gathers the IP addresses and generate a static peers file.
 Runs the testnet for 10 minutes (600 s)
 
 ## Tests
-Run 3 Besu nodes on a test network.
+Run 3 Besu nodes on the besu-network for 10 minutes.
