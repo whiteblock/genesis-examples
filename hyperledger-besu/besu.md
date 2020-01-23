@@ -10,7 +10,7 @@ Hyperledger Besu client
 ## Task-Runners
 
 ### static-peers
-Helper that gathers the IP addresses and generate a static peers file.
+[Helper](https://github.com/whiteblock/helpers/tree/master/besu) that gathers the IP addresses and generate a static peers file.
 
 ### testnet-expiration
 Runs the testnet for 10 minutes (600 s)
