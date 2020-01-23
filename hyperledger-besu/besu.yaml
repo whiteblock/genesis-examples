@@ -51,9 +51,9 @@ services:
       memory: 3 GB
       storage: 5 GiB
 task-runners:
-  - name: wait
+  - name: testnet-expiration
     script:
-      inline: sleep 1800
+      inline: sleep 600
   - name: static-peers # generate static peers
     image: "gcr.io/whiteblock/helpers/besu/staticpeers:master"
     volumes:
@@ -90,7 +90,7 @@ tests:
             resources:
               networks:
                 - name: besu-network
-      - name: wait
+      - name: testnet-expiration
         tasks:
-          - type: wait
-            timeout: 1800 s
+          - type: testnet-expiration
+            timeout: 600 s
