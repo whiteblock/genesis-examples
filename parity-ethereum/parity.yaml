@@ -1,0 +1,39 @@
+services:
+  - name: Parity1
+    image: parity/parity
+    resources:
+      cpus: 2
+      memory: 2 GB
+      storage: 5 GiB
+    script:
+      inline: parity --chain=dev --config=dev --no-discovery --keys-path=/data/keys --bootnodes=enode://f0fc159e1f89281607e8023524cdceb4046de2132cbec2ae272b1f396ade0fd9@${PARITY2_SERVICE0_PARITY_NETWORK}:30303
+    input-files:
+      - source-path: ./keystore/nodekey1
+        destination-path: /data/keys/nodekey
+      - source-path: ./keystore/pk1
+        destination-path: /data/keys/pk
+  - name: Parity2
+    image: parity/parity
+    resources:
+      cpus: 2
+      memory: 2 GB
+      storage: 5 GiB
+    script:
+      inline: parity --chain=dev --config=dev --no-discovery --keys-path=/data/keys --bootnodes=enode://a4d359b9c17d908852c8aa3478d8fca8cf7a372c109061484d3f78992bf7eaa4@${PARITY1_SERVICE0_PARITY_NETWORK}:30303
+    input-files:
+      - source-path: ./keystore/nodekey2
+        destination-path: /data/keys/nodekey
+      - source-path: ./keystore/pk2
+        destination-path: /data/keys/pk
+tests:
+  - name: run-parity
+    description: run ___ parity ethereum nodes on a testnet
+    system:
+      - type: Parity1
+        resources:
+          networks:
+            - name: parity-network
+      - type: Parity2
+        resources:
+          networks:
+            - name: parity-network
