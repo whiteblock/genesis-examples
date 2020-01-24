@@ -19,7 +19,7 @@ services:
       - source-path: ./quorum_files/passwords.txt
         destination-path: /data/passwords.txt
     script:
-      inline: cp /staticpeers/static-nodes.json /data/static-nodes.json && cp /staticpeers/static-nodes.json /data/permissioned-nodes.json && geth --datadir /data init /data/genesis.json && geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats Node1:quorum_besu_testnet_secret@ethstats-service0:3000 --syncmode full --nodiscover --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum --verbosity 6 --networkid 10
+      inline: cp /staticpeers/static-nodes.json /data/static-nodes.json && cp /staticpeers/static-nodes.json /data/permissioned-nodes.json && geth --datadir /data init /data/genesis.json && geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats $NAME:quorum_besu_testnet_secret@ethstats-service0:3000 --syncmode full --nodiscover --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum --verbosity 6 --networkid 10
   - name: Quorum2
     image: quorumengineering/quorum:2.2.5
     volumes:
@@ -40,7 +40,7 @@ services:
       - source-path: ./quorum_files/passwords.txt
         destination-path: /data/passwords.txt
     script:
-      inline: cp /staticpeers/static-nodes.json /data/static-nodes.json && cp /staticpeers/static-nodes.json /data/permissioned-nodes.json && geth --datadir /data init /data/genesis.json && geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats Node2:quorum_besu_testnet_secret@ethstats-service0:3000 --syncmode full --nodiscover --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum --verbosity 6 --networkid 10
+      inline: cp /staticpeers/static-nodes.json /data/static-nodes.json && cp /staticpeers/static-nodes.json /data/permissioned-nodes.json && geth --datadir /data init /data/genesis.json && geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats $NAME:quorum_besu_testnet_secret@ethstats-service0:3000 --syncmode full --nodiscover --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum --verbosity 6 --networkid 10
   - name: Quorum3
     image: quorumengineering/quorum:2.2.5
     volumes:
@@ -61,7 +61,7 @@ services:
       - source-path: ./quorum_files/passwords.txt
         destination-path: /data/passwords.txt
     script:
-      inline: cp /staticpeers/static-nodes.json /data/static-nodes.json && cp /staticpeers/static-nodes.json /data/permissioned-nodes.json && geth --datadir /data init /data/genesis.json && geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats Node3:quorum_besu_testnet_secret@ethstats-service0:3000 --syncmode full --nodiscover --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum --verbosity 6 --networkid 10
+      inline: cp /staticpeers/static-nodes.json /data/static-nodes.json && cp /staticpeers/static-nodes.json /data/permissioned-nodes.json && geth --datadir /data init /data/genesis.json && geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats $NAME:quorum_besu_testnet_secret@ethstats-service0:3000 --syncmode full --nodiscover --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum --verbosity 6 --networkid 10
   - name: Quorum4
     image: quorumengineering/quorum:2.2.5
     volumes:
@@ -82,7 +82,7 @@ services:
       - source-path: ./quorum_files/passwords.txt
         destination-path: /data/passwords.txt
     script:
-      inline: cp /staticpeers/static-nodes.json /data/static-nodes.json && cp /staticpeers/static-nodes.json /data/permissioned-nodes.json && geth --datadir /data init /data/genesis.json && geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats Node4:quorum_besu_testnet_secret@ethstats-service0:3000 --syncmode full --nodiscover --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum --verbosity 6 --networkid 10
+      inline: cp /staticpeers/static-nodes.json /data/static-nodes.json && cp /staticpeers/static-nodes.json /data/permissioned-nodes.json && geth --datadir /data init /data/genesis.json && geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats $NAME:quorum_besu_testnet_secret@ethstats-service0:3000 --syncmode full --nodiscover --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum --verbosity 6 --networkid 10
   - name: ethstats
     image: gcr.io/whiteblock/ethstats:master
     environment:
