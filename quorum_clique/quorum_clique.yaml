@@ -189,43 +189,35 @@ tests:
             timeout: 2 m
       - name: start-quorum
         system:
-          - type: Quorum1
-            count: 1
+          - type: Quorum1 # the number of instances defaults to 1 if not otherwise specified
             resources:
               networks:
                 - name: quorum_network
           - type: Quorum2
-            count: 1
             resources:
               networks:
                 - name: quorum_network
           - type: Quorum3
-            count: 1
             resources:
               networks:
                 - name: quorum_network
           - type: Quorum4
-            count: 1
             resources:
               networks:
                 - name: quorum_network
           - type: Quorum5
-            count: 1
             resources:
               networks:
                 - name: quorum_network
           - type: Quorum6
-            count: 1
             resources:
               networks:
                 - name: quorum_network
           - type: Quorum7
-            count: 1
             resources:
               networks:
                 - name: quorum_network
           - type: ethstats
-            count: 1
             port-mappings:
               - "80:3000"
             resources:
