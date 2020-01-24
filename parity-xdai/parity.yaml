@@ -31,13 +31,10 @@ services:
       storage: 5 GiB
     script:
       inline: parity --chain xdai --no-warp --config=dev --no-discovery --node-key=6af685c4de99d44c620ccd9464d19bdeb62a750b9ae49b1740fb28d68a0e5c7d --bootnodes=enode://04eab89943b5b2aa38745051471b31dc09d187c99b8fc6b740a8587ac43d1d65d644086a862189bc6298198453ba68076ebdb9cd7013d8893878f628a664376e@${PARITY1_SERVICE0_PARITY_NETWORK}:30303,enode://a1ae7b1352fc0e02df6d75e90046d17fb212629a608f584760434df2375fb301ec9e55ac693a77f4bc0c3efdafec3b3853aa7cb2cb48480800ef6658f747d034@${PARITY2_SERVICE0_PARITY_NETWORK}:30303,enode://579f786d4e2830bbcc02815a27e8a9bacccc9605df4dc6f20bcc1a6eb391e7225fff7cb83e5b4ecd1f3a94d8b733803f2f66b7e871961e7b029e22c155c3a778@${PARITY3_SERVICE0_PARITY_NETWORK}:30303
-task-runners:
-  - name: testnet-expiration
-    script:
-      inline: sleep 600
 tests:
   - name: run-parity
     description: run 4 parity ethereum xdai nodes on a testnet
+    wait-for: 10 m
     system:
       - type: Parity1
         resources:
@@ -55,8 +52,3 @@ tests:
         resources:
           networks:
             - name: parity-network
-    phases:
-      - name: run-parity
-        tasks:
-          - type: testnet-expiration
-            timeout: 600 s
