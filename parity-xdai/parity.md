@@ -1,4 +1,4 @@
-# Parity Ethereum Testnet
+# Parity Ethereum xDai Testnet
 
 This example shows how to deploy 4 Parity Ethereum nodes running the xDai chain on a test network.
 
