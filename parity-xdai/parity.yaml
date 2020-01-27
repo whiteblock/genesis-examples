@@ -34,7 +34,7 @@ services:
 tests:
   - name: run-parity
     description: run 4 parity ethereum xdai nodes on a testnet
-    wait-for: 10 m
+    wait-for: 10 m # test runs for 10 minutes
     system:
       - type: Parity1
         resources:
