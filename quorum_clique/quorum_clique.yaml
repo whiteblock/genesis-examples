@@ -1,165 +1,25 @@
 services:
-  - name: Quorum1
+  - name: Quorum
     image: quorumengineering/quorum:2.2.5
     volumes:
-      - path: /output/
-        name: eea-logs
       - path: /staticpeers/
         name: staticpeers
         scope: singleton
     resources:
       cpus: 4
       memory: 4 GB
-      storage: 5 GiB
     input-files:
       - source-path: genesis.json
         destination-path: /data/genesis.json
-      - source-path: key1
-        destination-path: /data/keystore/key1
-      - source-path: nodekey1
+      - source-path: key$_n
+        destination-path: /data/keystore/key$_n
+      - source-path: nodekey$_n
         destination-path: /data/nodekey
       - source-path: passwords.txt
         destination-path: /data/passwords.txt
     script:
-      inline: cp /staticpeers/static-nodes.json /data/static-nodes.json && cp /staticpeers/static-nodes.json /data/permissioned-nodes.json && geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats Node1:eea_testnet_secret@ethstats-service0:3000 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum  --verbosity 3 | tee /output/output.log 2>&1
-  - name: Quorum2
-    image: quorumengineering/quorum:2.2.5
-    volumes:
-      - path: /output/
-        name: eea-logs
-      - path: /staticpeers/
-        name: staticpeers
-        scope: singleton
-    resources:
-      cpus: 4
-      memory: 4 GB
-      storage: 5 GiB
-    input-files:
-      - source-path: genesis.json
-        destination-path: /data/genesis.json
-      - source-path: key2
-        destination-path: /data/keystore/key2
-      - source-path: nodekey2
-        destination-path: /data/nodekey
-      - source-path: passwords.txt
-        destination-path: /data/passwords.txt
-    script:
-      inline: cp /staticpeers/static-nodes.json /data/static-nodes.json && cp /staticpeers/static-nodes.json /data/permissioned-nodes.json && geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats Node2:eea_testnet_secret@ethstats-service0:3000 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum --verbosity 3 | tee /output/output.log 2>&1
-  - name: Quorum3
-    image: quorumengineering/quorum:2.2.5
-    volumes:
-      - path: /output/
-        name: eea-logs
-      - path: /staticpeers/
-        name: staticpeers
-        scope: singleton
-    resources:
-      cpus: 4
-      memory: 4 GB
-      storage: 5 GiB
-    input-files:
-      - source-path: genesis.json
-        destination-path: /data/genesis.json
-      - source-path: key3
-        destination-path: /data/keystore/key3
-      - source-path: nodekey3
-        destination-path: /data/nodekey
-      - source-path: passwords.txt
-        destination-path: /data/passwords.txt
-    script:
-      inline: cp /staticpeers/static-nodes.json /data/static-nodes.json && cp /staticpeers/static-nodes.json /data/permissioned-nodes.json && geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats Node3:eea_testnet_secret@ethstats-service0:3000 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum --verbosity 3 | tee /output/output.log 2>&1
-  - name: Quorum4
-    image: quorumengineering/quorum:2.2.5
-    volumes:
-      - path: /output/
-        name: eea-logs
-      - path: /staticpeers/
-        name: staticpeers
-        scope: singleton
-    resources:
-      cpus: 4
-      memory: 4 GB
-      storage: 5 GiB
-    input-files:
-      - source-path: genesis.json
-        destination-path: /data/genesis.json
-      - source-path: key4
-        destination-path: /data/keystore/key4
-      - source-path: nodekey4
-        destination-path: /data/nodekey
-      - source-path: passwords.txt
-        destination-path: /data/passwords.txt
-    script:
-      inline: cp /staticpeers/static-nodes.json /data/static-nodes.json && cp /staticpeers/static-nodes.json /data/permissioned-nodes.json && geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats Node4:eea_testnet_secret@ethstats-service0:3000 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum --verbosity 3 | tee /output/output.log 2>&1
-  - name: Quorum5
-    image: quorumengineering/quorum:2.2.5
-    volumes:
-      - path: /output/
-        name: eea-logs
-      - path: /staticpeers/
-        name: staticpeers
-        scope: singleton
-    resources:
-      cpus: 4
-      memory: 4 GB
-      storage: 5 GiB
-    input-files:
-      - source-path: genesis.json
-        destination-path: /data/genesis.json
-      - source-path: key5
-        destination-path: /data/keystore/key5
-      - source-path: nodekey5
-        destination-path: /data/nodekey
-      - source-path: passwords.txt
-        destination-path: /data/passwords.txt
-    script:
-      inline: cp /staticpeers/static-nodes.json /data/static-nodes.json && cp /staticpeers/static-nodes.json /data/permissioned-nodes.json && geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats Node5:eea_testnet_secret@ethstats-service0:3000 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum --verbosity 3 | tee /output/output.log 2>&1
-  - name: Quorum6
-    image: quorumengineering/quorum:2.2.5
-    volumes:
-      - path: /output/
-        name: eea-logs
-      - path: /staticpeers/
-        name: staticpeers
-        scope: singleton
-    resources:
-      cpus: 4
-      memory: 4 GB
-      storage: 5 GiB
-    input-files:
-      - source-path: genesis.json
-        destination-path: /data/genesis.json
-      - source-path: key6
-        destination-path: /data/keystore/key6
-      - source-path: nodekey6
-        destination-path: /data/nodekey
-      - source-path: passwords.txt
-        destination-path: /data/passwords.txt
-    script:
-      inline: cp /staticpeers/static-nodes.json /data/static-nodes.json && cp /staticpeers/static-nodes.json /data/permissioned-nodes.json && geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats Node6:eea_testnet_secret@ethstats-service0:3000 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum --verbosity 3 | tee /output/output.log 2>&1
-  - name: Quorum7
-    image: quorumengineering/quorum:2.2.5
-    volumes:
-      - path: /output/
-        name: eea-logs
-      - path: /staticpeers/
-        name: staticpeers
-        scope: singleton
-    resources:
-      cpus: 4
-      memory: 4 GB
-      storage: 5 GiB
-    input-files:
-      - source-path: genesis.json
-        destination-path: /data/genesis.json
-      - source-path: key7
-        destination-path: /data/keystore/key7
-      - source-path: nodekey7
-        destination-path: /data/nodekey
-      - source-path: passwords.txt
-        destination-path: /data/passwords.txt
-    script:
-      inline: cp /staticpeers/static-nodes.json /data/static-nodes.json && cp /staticpeers/static-nodes.json /data/permissioned-nodes.json && geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats Node7:eea_testnet_secret@ethstats-service0:3000 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum --verbosity 3 | tee /output/output.log 2>&1
+      inline: cp /staticpeers/static-nodes.json /data/static-nodes.json && cp /staticpeers/static-nodes.json /data/permissioned-nodes.json && geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats $NAME:secret@ethstats-service0:3000 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum  --verbosity 5
+  
   - name: ethstats
     image: gcr.io/whiteblock/ethstats:master
     environment:
@@ -175,10 +35,7 @@ task-runners:
         name: staticpeers
         scope: singleton
     script:
-      inline:  ./besuStaticPeers generate -a '[{"publicKey":"ac6b1096ca56b9f6d004b779ae3728bf83f8e22453404cc3cef16a3d9b96608bc67c4b30db88e0a5a6c6390213f7acbe1153ff6d23ce57380104288ae19373ef"},{"publicKey":"0ba6b9f606a43a95edc6247cdb1c1e105145817be7bcafd6b2c0ba15d58145f0dc1a194f70ba73cd6f4cdd6864edc7687f311254c7555cc32e4d45aeb1b80416"},{"publicKey":"579f786d4e2830bbcc02815a27e8a9bacccc9605df4dc6f20bcc1a6eb391e7225fff7cb83e5b4ecd1f3a94d8b733803f2f66b7e871961e7b029e22c155c3a778"},{"publicKey":"3d9ca5956b38557aba991e31cf510d4df641dce9cc26bfeb7de082f0c07abb6ede3a58410c8f249dabeecee4ad3979929ac4c7c496ad20b8cfdd061b7401b4f5"},{"publicKey":"3701f007bfa4cb26512d7df18e6bbd202e8484a6e11d387af6e482b525fa25542d46ff9c99db87bd419b980c24a086117a397f6d8f88e74351b41693880ea0cb"},{"publicKey":"eacaa74c4b0e7a9e12d2fe5fee6595eda841d6d992c35dbbcc50fcee4aa86dfbbdeff7dc7e72c2305d5a62257f82737a8cffc80474c15c611c037f52db1a3a7b"},{"publicKey":"239c1f044a2b03b6c4713109af036b775c5418fe4ca63b04b1ce00124af00ddab7cc088fc46020cdc783b6207efe624551be4c06a994993d8d70f684688fb7cf"}]' --ip '["'$QUORUM1_SERVICE0_QUORUM_NETWORK'", "'$QUORUM2_SERVICE0_QUORUM_NETWORK'", "'$QUORUM3_SERVICE0_QUORUM_NETWORK'", "'$QUORUM4_SERVICE0_QUORUM_NETWORK'", "'$QUORUM5_SERVICE0_QUORUM_NETWORK'", "'$QUORUM6_SERVICE0_QUORUM_NETWORK'", "'$QUORUM7_SERVICE0_QUORUM_NETWORK'"]' >> /staticpeers/static-nodes.json
-  - name: testnet-expiration
-    script:
-      inline: sleep 7200    
+      inline:  ./besuStaticPeers generate -a '[{"publicKey":"ac6b1096ca56b9f6d004b779ae3728bf83f8e22453404cc3cef16a3d9b96608bc67c4b30db88e0a5a6c6390213f7acbe1153ff6d23ce57380104288ae19373ef"},{"publicKey":"0ba6b9f606a43a95edc6247cdb1c1e105145817be7bcafd6b2c0ba15d58145f0dc1a194f70ba73cd6f4cdd6864edc7687f311254c7555cc32e4d45aeb1b80416"},{"publicKey":"579f786d4e2830bbcc02815a27e8a9bacccc9605df4dc6f20bcc1a6eb391e7225fff7cb83e5b4ecd1f3a94d8b733803f2f66b7e871961e7b029e22c155c3a778"},{"publicKey":"3d9ca5956b38557aba991e31cf510d4df641dce9cc26bfeb7de082f0c07abb6ede3a58410c8f249dabeecee4ad3979929ac4c7c496ad20b8cfdd061b7401b4f5"},{"publicKey":"3701f007bfa4cb26512d7df18e6bbd202e8484a6e11d387af6e482b525fa25542d46ff9c99db87bd419b980c24a086117a397f6d8f88e74351b41693880ea0cb"},{"publicKey":"eacaa74c4b0e7a9e12d2fe5fee6595eda841d6d992c35dbbcc50fcee4aa86dfbbdeff7dc7e72c2305d5a62257f82737a8cffc80474c15c611c037f52db1a3a7b"},{"publicKey":"239c1f044a2b03b6c4713109af036b775c5418fe4ca63b04b1ce00124af00ddab7cc088fc46020cdc783b6207efe624551be4c06a994993d8d70f684688fb7cf"}]' --ip '["'$QUORUM_SERVICE0_QUORUM_NETWORK'", "'$QUORUM_SERVICE1_QUORUM_NETWORK'", "'$QUORUM_SERVICE2_QUORUM_NETWORK'", "'$QUORUM_SERVICE3_QUORUM_NETWORK'", "'$QUORUM_SERVICE4_QUORUM_NETWORK'", "'$QUORUM_SERVICE5_QUORUM_NETWORK'", "'$QUORUM_SERVICE6_QUORUM_NETWORK'"]' >> /staticpeers/static-nodes.json
 tests:
   - name: testnet
     description: run an EEA testnet and execute some simple transactions
@@ -186,72 +43,17 @@ tests:
       - name: generate-static-peers
         tasks:
           - type: static-peers
-            timeout: 2 m
       - name: start-quorum
+        duration: 2h 
         system:
-          - type: Quorum1
-            count: 1
-            port-mappings:
-              - "30303:30303"
-              - "8545:8545"
-            resources:
-              networks:
-                - name: quorum_network
-          - type: Quorum2
-            count: 1
-            port-mappings:
-              - "30304:30303"
-              - "8546:8545"
-            resources:
-              networks:
-                - name: quorum_network
-          - type: Quorum3
-            count: 1
-            port-mappings:
-              - "30305:30303"
-              - "8547:8545"
-            resources:
-              networks:
-                - name: quorum_network
-          - type: Quorum4
-            count: 1
-            port-mappings:
-              - "30306:30303"
-              - "8548:8545"
-            resources:
-              networks:
-                - name: quorum_network
-          - type: Quorum5
-            count: 1
-            port-mappings:
-              - "30307:30303"
-              - "8549:8545"
-            resources:
-              networks:
-                - name: quorum_network
-          - type: Quorum6
-            count: 1
-            port-mappings:
-              - "30308:30303"
-              - "8550:8545"
-            resources:
-              networks:
-                - name: quorum_network
-          - type: Quorum7
-            count: 1
-            port-mappings:
-              - "30308:30303"
-              - "8551:8545"
+          - type: Quorum 
+            count: 7
             resources:
               networks:
                 - name: quorum_network
           - type: ethstats
-            count: 1
             port-mappings:
               - "80:3000"
             resources:
               networks:
                 - name: quorum_network
-      - name: testnet-expiration
-        tasks:
-          - type: testnet-expiration
