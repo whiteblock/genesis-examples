@@ -117,7 +117,7 @@ task-runners:
       inline: ./pk-generator generate --numKeys 4
   - name: topology-generator
     # image has to include and build the packages that will be necessary to run the helper
-    image: "gcr.io/whiteblock/helpers/topologygen@sha256:28f57788dc7719c4d69f8feaee6e00e2e5a6d99927f2b7bdd2ec23d0c0828282"
+    image: "gcr.io/whiteblock/helpers/topologygen:master"
     volumes: # stores files peers_*.txt
       - name: topologies
         path: /topology/
