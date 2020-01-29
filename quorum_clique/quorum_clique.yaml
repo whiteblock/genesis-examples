@@ -44,7 +44,7 @@ tests:
         tasks:
           - type: static-peers
       - name: start-quorum
-        duration: 2h 
+        duration: 120 m
         system:
           - type: Quorum 
             count: 7
