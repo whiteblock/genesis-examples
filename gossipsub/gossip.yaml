@@ -117,7 +117,7 @@ task-runners:
       inline: ./pk-generator generate --numKeys 4
   - name: topology-generator
     # image has to include and build the packages that will be necessary to run the helper
-    image: "gcr.io/whiteblock/helpers/topologygen:master"
+    image: "gcr.io/whiteblock/helpers/topologygen@sha256:28f57788dc7719c4d69f8feaee6e00e2e5a6d99927f2b7bdd2ec23d0c0828282"
     volumes: # stores files peers_*.txt
       - name: topologies
         path: /topology/
@@ -130,7 +130,7 @@ task-runners:
       memory: 2 GB
       storage: 512 MB
     script: # need to edit this to output the correct number of files for every node in the network
-      inline: python topo.py 42 4 2 true && mv topology/* /topology && bash getIP.sh && mv NODECOUNT.txt /topology && mv IP.txt /topology && sleep 15
+      inline: python topo.py 42 4 2 true && cp topology/* /topology && bash getIP.sh && sleep 15
   - name: init
     script:
       inline: sleep 15
@@ -139,8 +139,8 @@ task-runners:
       inline: sleep 750
 tests:
   - name: gossip-load-test
-    timeout: infinite
     description: run a gossip network and send messages
+    timeout: infinite
     phases:
       - name: generate-topology-and-keys # generate topologies
         tasks:
@@ -173,8 +173,7 @@ tests:
               networks:
               - name: gossip-network
         tasks:
-        - type: init
-          timeout: infinite
+          - type: init
       - name: start-orchestra # add in orchestra node
         system:
           - name: orchestra-node
@@ -184,5 +183,5 @@ tests:
               networks:
               - name: gossip-network
         tasks:
-        -  type: run
-           timeout: infinite
+         -  type: run
+            timeout: infinite
