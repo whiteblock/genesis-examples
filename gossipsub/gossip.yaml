@@ -4,6 +4,9 @@ services:
     environment:
       SELF: 0
     volumes:
+      - name: privKeys
+        path: /pems/
+        scope: singleton
       - name: topologies
         path: /topology/
         scope: singleton
@@ -12,19 +15,20 @@ services:
       memory: 4 GB
       storage: 20 GiB
     input-files:
-      - source-path: pems/pk-1.pem
-        destination-path: /go-libp2p-pubsub-benchmark-tools/pk.pem
       - source-path: MADDR.txt
         destination-path: /go-libp2p-pubsub-benchmark-tools/MADDR.txt
       - source-path: start.sh
         destination-path: /go-libp2p-pubsub-benchmark-tools/start.sh
     script:
-      inline: cp /topology/peers_0.txt /go-libp2p-pubsub-benchmark-tools/peers.txt && cp /topology/NODECOUNT.txt /go-libp2p-pubsub-benchmark-tools/NODECOUNT.txt && cp /topology/IP.txt /go-libp2p-pubsub-benchmark-tools/IP.txt && sudo chmod 777 start.sh && ./start.sh
+      inline: cp /pems/pk-1.pem /go-libp2p-pubsub-benchmark-tools/pk.pem && cp /topology/peers_0.txt /go-libp2p-pubsub-benchmark-tools/peers.txt && cp /topology/NODECOUNT.txt /go-libp2p-pubsub-benchmark-tools/NODECOUNT.txt && cp /topology/IP.txt /go-libp2p-pubsub-benchmark-tools/IP.txt && sudo chmod 777 start.sh && ./start.sh
   - name: gossip-node1
     image: "gcr.io/whiteblock/gossipsub:master"
     environment:
       SELF: 1
     volumes:
+      - name: privKeys
+        path: /pems/
+        scope: singleton      -
       - name: topologies
         path: /topology/
         scope: singleton
@@ -33,19 +37,20 @@ services:
       memory: 4 GB
       storage: 20 GiB
     input-files:
-      - source-path: pems/pk-2.pem
-        destination-path: /go-libp2p-pubsub-benchmark-tools/pk.pem
       - source-path: MADDR.txt
         destination-path: /go-libp2p-pubsub-benchmark-tools/MADDR.txt
       - source-path: start.sh
         destination-path: /go-libp2p-pubsub-benchmark-tools/start.sh
     script:
-      inline: cp /topology/peers_1.txt /go-libp2p-pubsub-benchmark-tools/peers.txt && cp /topology/NODECOUNT.txt /go-libp2p-pubsub-benchmark-tools/NODECOUNT.txt && cp /topology/IP.txt /go-libp2p-pubsub-benchmark-tools/IP.txt && sudo chmod 777 start.sh && ./start.sh
+      inline: cp /pems/pk-2.pem /go-libp2p-pubsub-benchmark-tools/pk.pem && cp /topology/peers_1.txt /go-libp2p-pubsub-benchmark-tools/peers.txt && cp /topology/NODECOUNT.txt /go-libp2p-pubsub-benchmark-tools/NODECOUNT.txt && cp /topology/IP.txt /go-libp2p-pubsub-benchmark-tools/IP.txt && sudo chmod 777 start.sh && ./start.sh
   - name: gossip-node2
     image: "gcr.io/whiteblock/gossipsub:master"
     environment:
       SELF: 2
     volumes:
+      - name: privKeys
+        path: /pems/
+        scope: singleton
       - name: topologies
         path: /topology/
         scope: singleton
@@ -54,19 +59,20 @@ services:
       memory: 4 GB
       storage: 20 GiB
     input-files:
-      - source-path: pems/pk-3.pem
-        destination-path: /go-libp2p-pubsub-benchmark-tools/pk.pem
       - source-path: MADDR.txt
         destination-path: /go-libp2p-pubsub-benchmark-tools/MADDR.txt
       - source-path: start.sh
         destination-path: /go-libp2p-pubsub-benchmark-tools/start.sh
     script:
-      inline: cp /topology/peers_2.txt /go-libp2p-pubsub-benchmark-tools/peers.txt && cp /topology/NODECOUNT.txt /go-libp2p-pubsub-benchmark-tools/NODECOUNT.txt && cp /topology/IP.txt /go-libp2p-pubsub-benchmark-tools/IP.txt && sudo chmod 777 start.sh && ./start.sh && sleep 600
+      inline: cp /pems/pk-3.pem /go-libp2p-pubsub-benchmark-tools/pk.pem && cp /topology/peers_2.txt /go-libp2p-pubsub-benchmark-tools/peers.txt && cp /topology/NODECOUNT.txt /go-libp2p-pubsub-benchmark-tools/NODECOUNT.txt && cp /topology/IP.txt /go-libp2p-pubsub-benchmark-tools/IP.txt && sudo chmod 777 start.sh && ./start.sh && sleep 600
   - name: gossip-node3
     image: "gcr.io/whiteblock/gossipsub:master"
     environment:
       SELF: 3
     volumes:
+      - name: privKeys
+        path: /pems/
+        scope: singleton
       - name: topologies
         path: /topology/
         scope: singleton
@@ -75,14 +81,12 @@ services:
       memory: 4 GB
       storage: 20 GiB
     input-files:
-      - source-path: pems/pk-4.pem
-        destination-path: /go-libp2p-pubsub-benchmark-tools/pk.pem
       - source-path: MADDR.txt
         destination-path: /go-libp2p-pubsub-benchmark-tools/MADDR.txt
       - source-path: start.sh
         destination-path: /go-libp2p-pubsub-benchmark-tools/start.sh
     script:
-      inline: cp /topology/peers_3.txt /go-libp2p-pubsub-benchmark-tools/peers.txt && cp /topology/NODECOUNT.txt /go-libp2p-pubsub-benchmark-tools/NODECOUNT.txt && cp /topology/IP.txt /go-libp2p-pubsub-benchmark-tools/IP.txt && sudo chmod 777 start.sh && ./start.sh && sleep 600
+      inline: cp /pems/pk-4.pem /go-libp2p-pubsub-benchmark-tools/pk.pem && cp /topology/peers_3.txt /go-libp2p-pubsub-benchmark-tools/peers.txt && cp /topology/NODECOUNT.txt /go-libp2p-pubsub-benchmark-tools/NODECOUNT.txt && cp /topology/IP.txt /go-libp2p-pubsub-benchmark-tools/IP.txt && sudo chmod 777 start.sh && ./start.sh && sleep 600
   - name: orchestra-node
     image: "gcr.io/whiteblock/gossipsub:master"
     volumes:
@@ -103,6 +107,14 @@ services:
     script:
      inline: sleep 15 && cp /topology/NODECOUNT.txt /go-libp2p-pubsub-benchmark-tools/NODECOUNT.txt && cp /topology/IP.txt /go-libp2p-pubsub-benchmark-tools/IP.txt && sudo chmod 777 ./config_orchestra.sh && ./config_orchestra.sh && sudo chmod 777 ./orchestra.sh && ./orchestra.sh && sleep 120
 task-runners:
+  - name: priv-key-gen
+    image: "gcr.io/whiteblock/helpers/pk-generator/keygen:master"
+    volumes:
+      - name: privKeys
+        path: /pems/
+        scope: singleton
+    script:
+      inline: ./pk-generator generate --numKeys 4
   - name: topology-generator
     # image has to include and build the packages that will be necessary to run the helper
     image: "gcr.io/whiteblock/helpers/topologygen:master"
@@ -130,6 +142,9 @@ tests:
     timeout: infinite
     description: run a gossip network and send messages
     phases:
+      - name: private-key-generation
+        tasks:
+          - type: priv-key-gen
       - name: generate-topology # generate topologies
         tasks:
           - type: topology-generator
