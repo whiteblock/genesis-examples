@@ -1,0 +1,18 @@
+services:
+  - name: lnd
+    image: gcr.io/whiteblock/btc-lightning/lnd:master
+  - name: btcd
+    image: gcr.io/whiteblock/btc-lightning/btcd:master
+tests:
+  - name: lightning
+    description: btc lightning test network
+    system:
+      - type: lnd
+        resources:
+          networks:
+            - name: lightning-network
+      - type: btcd
+        resources:
+          networks:
+            - name: lightning-network
+    wait-for: 10 m
