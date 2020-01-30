@@ -15,6 +15,9 @@ Load injector service
 
 ## Task-Runners
 
+### priv-key-gen
+Generates private keys for gossipsub nodes
+
 ### init
 Gives Gossipsub nodes 15 seconds to start up
 
