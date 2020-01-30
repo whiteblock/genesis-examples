@@ -1,0 +1,106 @@
+services:
+  - name: geth1
+    description: this service runs the go-ethereum client
+    image: "ethereum/client-go:alltools-latest"
+    volumes:
+      - path: /staticpeers/
+        name: staticpeers
+        scope: singleton
+    script:
+      inline: cp /staticpeers/static-nodes.json /geth/geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --etherbase 0 --unlock 0 --allow-insecure-unlock --password ./geth/pw.txt --mine --minerthreads=1
+    input-files:
+      - source-path: ./genesis.json
+        destination-path: /geth/genesis.json
+      - source-path: ./keystore/pk1
+        destination-path: /geth/keystore/pk
+      - source-path: ./keystore/pw.txt
+        destination-path: /geth/pw.txt
+      - source-path: ./keystore/nodekey1
+        destination-path: /geth/geth/nodekey
+    resources:
+      cpus: 2
+      memory: 2 GB
+      storage: 5 GiB
+  - name: geth2
+    description: this service runs the go-ethereum client
+    image: "ethereum/client-go:alltools-latest"
+    volumes:
+      - path: /staticpeers/
+        name: staticpeers
+        scope: singleton
+    script:
+      inline: cp /staticpeers/static-nodes.json /geth/geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --etherbase 0 --unlock 0 --allow-insecure-unlock --password ./geth/pw.txt --mine --minerthreads=1
+    input-files:
+      - source-path: ./genesis.json
+        destination-path: /geth/genesis.json
+      - source-path: ./keystore/pk2
+        destination-path: /geth/keystore/pk
+      - source-path: ./keystore/pw.txt
+        destination-path: /geth/pw.txt
+      - source-path: ./keystore/nodekey2
+        destination-path: /geth/geth/nodekey
+    resources:
+      cpus: 1
+      memory: 2 GB
+      storage: 5 GiB
+task-runners:
+  - name: geth-staticpeers-helper
+    description: will gather the IP addresses and generate a static peers file.
+    image: "gcr.io/whiteblock/helpers/besu/staticpeers:master"
+    volumes:
+      - path: /staticpeers/
+        name: staticpeers
+        scope: singleton
+    script:
+      inline: ./besuStaticPeers generate -a '[{"publicKey":"04eab89943b5b2aa38745051471b31dc09d187c99b8fc6b740a8587ac43d1d65d644086a862189bc6298198453ba68076ebdb9cd7013d8893878f628a664376e"},{"publicKey":"a1ae7b1352fc0e02df6d75e90046d17fb212629a608f584760434df2375fb301ec9e55ac693a77f4bc0c3efdafec3b3853aa7cb2cb48480800ef6658f747d034"}]' -i '["'$GETH1_SERVICE0_COMMON_NETWORK'","'$GETH2_SERVICE0_COMMON_NETWORK'"]' >> /staticpeers/static-nodes.json
+    resources:
+      cpus: 1
+      memory: 2 GB
+      storage: 5 GiB
+tests:
+  - name: geth-partition
+    description: first test - run two geth nodes on the common-network
+    phases:
+      - name: create
+        tasks:
+          - type: geth-staticpeers-helper
+      - name: start
+        description: start the remaining node(s)
+        system:
+          - type: geth1
+            count: 1
+            resources:
+              networks:
+                - name: common-network
+          - type: geth2
+            count: 1
+            resources:
+              networks:
+                - name: common-network
+        duration: 10 m
+      - name: partition
+        description: partition the remaining node(s)
+        system:
+          - type: geth1
+            resources:
+              networks:
+                - name: common-network
+          - type: geth2
+            resources:
+              networks:
+                - name: common-network2
+        duration: 10 m
+      - name: reconnect
+        description: reconnect the remaining node(s)
+        system:
+          - type: geth1
+            count: 1
+            resources:
+              networks:
+                - name: common-network
+          - type: geth2
+            count: 1
+            resources:
+              networks:
+                - name: common-network
+        duration: 10 m
