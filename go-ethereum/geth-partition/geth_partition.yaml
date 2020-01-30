@@ -7,7 +7,7 @@ services:
         name: staticpeers
         scope: singleton
     script:
-      inline: cp /staticpeers/static-nodes.json /geth/geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,db,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --etherbase 0 --unlock 0 --allow-insecure-unlock --password ./geth/pw.txt --mine --minerthreads=1
+      inline: cp /staticpeers/static-nodes.json /geth/geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --etherbase 0 --unlock 0 --allow-insecure-unlock --password ./geth/pw.txt --mine --minerthreads=1
     input-files:
       - source-path: ./genesis.json
         destination-path: /geth/genesis.json
@@ -29,7 +29,7 @@ services:
         name: staticpeers
         scope: singleton
     script:
-      inline: cp /staticpeers/static-nodes.json /geth/geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,db,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --etherbase 0 --unlock 0 --allow-insecure-unlock --password ./geth/pw.txt --mine --minerthreads=1
+      inline: cp /staticpeers/static-nodes.json /geth/geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --etherbase 0 --unlock 0 --allow-insecure-unlock --password ./geth/pw.txt --mine --minerthreads=1
     input-files:
       - source-path: ./genesis.json
         destination-path: /geth/genesis.json
@@ -62,9 +62,8 @@ task-runners:
       memory: 2 GB
       storage: 5 GiB
 tests:
-  - name: geth_network_2_nodes
+  - name: geth-partition
     description: first test - run two geth nodes on the common-network
-
     phases:
       - name: create
         tasks:
