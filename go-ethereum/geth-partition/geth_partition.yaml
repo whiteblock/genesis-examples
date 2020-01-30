@@ -43,11 +43,7 @@ services:
       cpus: 1
       memory: 2 GB
       storage: 5 GiB
-
 task-runners:
-  - name: wait
-    script:
-      inline: sleep 600
   - name: geth-staticpeers-helper
     description: will gather the IP addresses and generate a static peers file.
     image: "gcr.io/whiteblock/helpers/besu/staticpeers:master"
@@ -81,9 +77,7 @@ tests:
             resources:
               networks:
                 - name: common-network
-      - name: make-some-blocks
-        tasks:
-          - type: wait
+        duration: 10 m
       - name: partition
         description: partition the remaining node(s)
         system:
@@ -95,9 +89,7 @@ tests:
             resources:
               networks:
                 - name: common-network2
-      - name: wait
-        tasks:
-          - type: wait
+        duration: 10 m
       - name: reconnect
         description: reconnect the remaining node(s)
         system:
@@ -111,3 +103,4 @@ tests:
             resources:
               networks:
                 - name: common-network
+        duration: 10 m
