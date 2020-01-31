@@ -1,5 +1,5 @@
 services:
-  - name: Quorum1
+  - name: Quorum
     image: quorumengineering/quorum:2.2.5
     volumes:
       - path: /staticpeers/
@@ -12,72 +12,9 @@ services:
     input-files:
       - source-path: ./quorum-genesis.json
         destination-path: /data/genesis.json
-      - source-path: ./quorum_files/key1
+      - source-path: ./quorum_files/key$_n
         destination-path: /data/keystore/key
-      - source-path: ./quorum_files/nodekey1
-        destination-path: /data/nodekey
-      - source-path: ./quorum_files/passwords.txt
-        destination-path: /data/passwords.txt
-    script:
-      inline: cp /staticpeers/static-nodes.json /data/static-nodes.json && cp /staticpeers/static-nodes.json /data/permissioned-nodes.json && geth --datadir /data init /data/genesis.json && geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats $NAME:quorum_besu_testnet_secret@ethstats-service0:3000 --syncmode full --nodiscover --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum --verbosity 6 --networkid 10
-  - name: Quorum2
-    image: quorumengineering/quorum:2.2.5
-    volumes:
-      - path: /staticpeers/
-        name: staticpeers
-        scope: singleton
-    resources:
-      cpus: 4
-      memory: 4 GB
-      storage: 5 GiB
-    input-files:
-      - source-path: ./quorum-genesis.json
-        destination-path: /data/genesis.json
-      - source-path: ./quorum_files/key2
-        destination-path: /data/keystore/key
-      - source-path: ./quorum_files/nodekey2
-        destination-path: /data/nodekey
-      - source-path: ./quorum_files/passwords.txt
-        destination-path: /data/passwords.txt
-    script:
-      inline: cp /staticpeers/static-nodes.json /data/static-nodes.json && cp /staticpeers/static-nodes.json /data/permissioned-nodes.json && geth --datadir /data init /data/genesis.json && geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats $NAME:quorum_besu_testnet_secret@ethstats-service0:3000 --syncmode full --nodiscover --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum --verbosity 6 --networkid 10
-  - name: Quorum3
-    image: quorumengineering/quorum:2.2.5
-    volumes:
-      - path: /staticpeers/
-        name: staticpeers
-        scope: singleton
-    resources:
-      cpus: 4
-      memory: 4 GB
-      storage: 5 GiB
-    input-files:
-      - source-path: ./quorum-genesis.json
-        destination-path: /data/genesis.json
-      - source-path: ./quorum_files/key3
-        destination-path: /data/keystore/key
-      - source-path: ./quorum_files/nodekey3
-        destination-path: /data/nodekey
-      - source-path: ./quorum_files/passwords.txt
-        destination-path: /data/passwords.txt
-    script:
-      inline: cp /staticpeers/static-nodes.json /data/static-nodes.json && cp /staticpeers/static-nodes.json /data/permissioned-nodes.json && geth --datadir /data init /data/genesis.json && geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats $NAME:quorum_besu_testnet_secret@ethstats-service0:3000 --syncmode full --nodiscover --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum --verbosity 6 --networkid 10
-  - name: Quorum4
-    image: quorumengineering/quorum:2.2.5
-    volumes:
-      - path: /staticpeers/
-        name: staticpeers
-        scope: singleton
-    resources:
-      cpus: 4
-      memory: 4 GB
-      storage: 5 GiB
-    input-files:
-      - source-path: ./quorum-genesis.json
-        destination-path: /data/genesis.json
-      - source-path: ./quorum_files/key4
-        destination-path: /data/keystore/key
-      - source-path: ./quorum_files/nodekey4
+      - source-path: ./quorum_files/nodekey$_n
         destination-path: /data/nodekey
       - source-path: ./quorum_files/passwords.txt
         destination-path: /data/passwords.txt
@@ -90,48 +27,14 @@ services:
     input-files:
       - source-path: ./ws_secret.json
         destination-path: /eth-netstats/ws_secret.json
-  - name: Besu1
+  - name: Besu
     image: "hyperledger/besu:develop"
     script:
       inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis.json --discovery-enabled=true --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE --network-id 10
     input-files:
       - source-path: ./besu-genesis.json
         destination-path: /var/lib/besu/genesis.json
-      - source-path: ./besu_files/pk1
-        destination-path: /var/lib/besu/key
-    volumes:
-      - path: /staticpeers/
-        name: staticpeers
-        scope: singleton
-    resources:
-      cpus: 2
-      memory: 3 GB
-      storage: 5 GiB
-  - name: Besu2
-    image: "hyperledger/besu:develop"
-    script:
-      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis.json --discovery-enabled=true --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE --network-id 10
-    input-files:
-      - source-path: ./besu-genesis.json
-        destination-path: /var/lib/besu/genesis.json
-      - source-path: ./besu_files/pk2
-        destination-path: /var/lib/besu/key
-    volumes:
-      - path: /staticpeers/
-        name: staticpeers
-        scope: singleton
-    resources:
-      cpus: 2
-      memory: 3 GB
-      storage: 5 GiB
-  - name: Besu3
-    image: "hyperledger/besu:develop"
-    script:
-      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis.json --discovery-enabled=true --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE --network-id 10
-    input-files:
-      - source-path: ./besu-genesis.json
-        destination-path: /var/lib/besu/genesis.json
-      - source-path: ./besu_files/pk3
+      - source-path: ./besu_files/pk$_n
         destination-path: /var/lib/besu/key
     volumes:
       - path: /staticpeers/
@@ -155,7 +58,7 @@ task-runners:
       inline: sleep 600
 tests:
   - name: testnet
-    description: run an Quorum-Besu testnet
+    description: run a Quorum-Besu testnet
     phases:
       - name: generate-static-peers
         tasks:
@@ -163,41 +66,13 @@ tests:
             timeout: 2 m
       - name: run-testnet
         system:
-          - type: Quorum1
-            count: 1
+          - type: Quorum
+            count: 4
             resources:
               networks:
                 - name: quorum-network
-          - type: Quorum2
-            count: 1
-            resources:
-              networks:
-                - name: quorum-network
-          - type: Quorum3
-            count: 1
-            resources:
-              networks:
-                - name: quorum-network
-          - type: Quorum4
-            count: 1
-            resources:
-              networks:
-                - name: quorum-network
-          - name: Besu1
-            type: Besu1
-            count: 1
-            resources:
-              networks:
-                - name: quorum-network
-          - name: Besu2
-            type: Besu2
-            count: 1
-            resources:
-              networks:
-                - name: quorum-network
-          - name: Besu3
-            type: Besu3
-            count: 1
+          - type: Besu
+            count: 3
             resources:
               networks:
                 - name: quorum-network
