@@ -140,7 +140,7 @@ task-runners:
 tests:
   - name: gossip-load-test
     description: run a gossip network and send messages
-    timeout: infinite
+    timeout: 60 m
     phases:
       - name: generate-topology-and-keys # generate topologies
         tasks:
@@ -184,4 +184,4 @@ tests:
               - name: gossip-network
         tasks:
          -  type: run
-            timeout: infinite
+            timeout: 60 m
