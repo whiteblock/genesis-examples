@@ -166,8 +166,6 @@ tests:
             resources: 
               networks:
               - name: gossip-network
-        tasks:
-          - type: init
       - name: start-orchestra # add in orchestra node
         duration: 60 m
         system:
