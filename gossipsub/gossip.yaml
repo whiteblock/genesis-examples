@@ -140,7 +140,6 @@ task-runners:
 tests:
   - name: gossip-load-test
     description: run a gossip network and send messages
-    timeout: 60 m
     phases:
       - name: generate-topology-and-keys # generate topologies
         tasks:
@@ -175,6 +174,7 @@ tests:
         tasks:
           - type: init
       - name: start-orchestra # add in orchestra node
+        duration: 60 m
         system:
           - name: orchestra-node
             type: orchestra-node
@@ -184,4 +184,3 @@ tests:
               - name: gossip-network
         tasks:
          -  type: run
-            timeout: 60 m
