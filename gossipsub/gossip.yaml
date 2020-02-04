@@ -151,27 +151,27 @@ tests:
           - name: gossip-node1
             type: gossip-node1
             count: 1
-            resources: 
+            resources:
               networks:
               - name: gossip-network
           - name: gossip-node2
             type: gossip-node2
             count: 1
-            resources: 
+            resources:
               networks:
               - name: gossip-network
           - name: gossip-node3
             type: gossip-node3
             count: 1
-            resources: 
+            resources:
               networks:
               - name: gossip-network
       - name: start-orchestra # add in orchestra node
-        duration: 60 m
+        duration: 15 m
         system:
           - name: orchestra-node
             type: orchestra-node
             count: 1
-            resources: 
+            resources:
               networks:
               - name: gossip-network
