@@ -25,9 +25,9 @@ Gives Gossipsub nodes 15 seconds to start up
 Creates a pseudo-randomly generated list of peers for gossipnodes to connect to and generate a deterministic network topology
 
 ### run 
-Runs the testnetwork for 12.5 minutes (750 s)
+Runs the testnetwork for 15 minutes
 
 ## Tests
 
 ### gossip-load-test
-Runs a gossipsub network and sends messages for 12.5 minutes (750 s)
+Runs a gossipsub network and sends messages for 15 minutes

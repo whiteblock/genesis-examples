@@ -53,9 +53,6 @@ services:
       - source-path: ws_secret.json
         destination-path: /eth-netstats/ws_secret.json
 task-runners:
-  - name: wait
-    script:
-      inline: sleep 1800
   - name: geth-staticpeers-helper
     description: will gather the IP addresses and generate a static peers file.
     image: "gcr.io/whiteblock/helpers/besu/staticpeers:master"
@@ -79,6 +76,7 @@ tests:
             timeout: 3 m
       - name: start
         description: start the remaining node(s)
+        duration: 10 m
         system:
           - name: multigeth_boot_node
             type: multigeth_boot_node
@@ -100,7 +98,3 @@ tests:
             resources:
               networks:
                 - name: common-network
-      - name: wait
-        tasks:
-          - type: wait
-            timeout: 1800 s
