@@ -103,4 +103,4 @@ tests:
       - name: wait
         tasks:
           - type: wait
-            timeout: 1800 s
+            timeout: 600 s
