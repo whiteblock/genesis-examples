@@ -28,6 +28,9 @@ pipeline {
     stage('publish-hashes') {
       steps {
         sh 'find . -name *.yaml | xargs sha256sum > latest.txt'
+        container('gsutil') {
+          sh 'gsutil rsync latest.txt gs://assets.whiteblock.io/hashes/latest.txt'
+        }
       }
     }
   }
