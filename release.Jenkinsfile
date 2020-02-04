@@ -12,6 +12,7 @@ pipeline {
       cicd: true
   spec:
     serviceAccountName: tiller
+    containers:
     - name: gsutil
       image: gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
       command:
