@@ -27,7 +27,7 @@ pipeline {
   stages {
     stage('publish-hashes') {
       steps {
-        sh 'find . -name *.yaml | xargs shasum > latest.txt'
+        sh 'find . -name *.yaml | xargs sha256sum > latest.txt'
       }
     }
   }
