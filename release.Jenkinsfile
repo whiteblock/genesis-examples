@@ -32,7 +32,7 @@ pipeline {
           find . -name *.yaml | xargs sha256sum > hashes/latest.txt
         '''
         container('gsutil') {
-          sh 'gsutil rsync hashes/ gs://assets.whiteblock.io'
+          sh 'gsutil rsync hashes/ gs://assets.whiteblock.io/hashes/'
         }
       }
     }
