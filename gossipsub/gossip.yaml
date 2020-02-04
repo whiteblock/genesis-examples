@@ -131,22 +131,16 @@ task-runners:
       storage: 512 MB
     script: # need to edit this to output the correct number of files for every node in the network
       inline: python topo.py 42 4 2 true && cp topology/* /topology && bash getIP.sh && sleep 15
-  - name: init
-    script:
-      inline: sleep 15
-  - name: run
-    script:
-      inline: sleep 750
 tests:
   - name: gossip-load-test
     description: run a gossip network and send messages
-    timeout: infinite
     phases:
       - name: generate-topology-and-keys # generate topologies
         tasks:
           - type: topology-generator
           - type: priv-key-gen
       - name: gossiping # spin up gossip nodes
+        duration: 15 s
         system:
           - name: gossip-node0
             type: gossip-node0
@@ -172,9 +166,8 @@ tests:
             resources: 
               networks:
               - name: gossip-network
-        tasks:
-          - type: init
       - name: start-orchestra # add in orchestra node
+        duration: 60 m
         system:
           - name: orchestra-node
             type: orchestra-node
@@ -182,6 +175,3 @@ tests:
             resources: 
               networks:
               - name: gossip-network
-        tasks:
-         -  type: run
-            timeout: infinite
