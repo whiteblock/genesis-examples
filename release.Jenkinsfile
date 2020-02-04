@@ -28,7 +28,7 @@ pipeline {
     stage('publish-hashes') {
       steps {
         sh '''
-          mkir hashes
+          mkdir hashes
           find . -name *.yaml | xargs sha256sum > hashes/latest.txt
         '''
         container('gsutil') {
