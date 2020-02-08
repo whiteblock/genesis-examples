@@ -18,7 +18,7 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
       - source-path: ./keystore/nodekey1
         destination-path: /geth/geth/nodekey
     resources: # specify the resources you'd like to allot to your service
-      cpus: 2
+      cpus: 4
       memory: 2 GB
       storage: 5 GiB
   - name: geth2 # the name of the service you'd like to test
@@ -40,7 +40,7 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
       - source-path: ./keystore/nodekey2
         destination-path: /geth/geth/nodekey
     resources: # specify the resources you'd like to allot to your service
-      cpus: 1
+      cpus: 4
       memory: 2 GB
       storage: 5 GiB
   - name: ethstats
@@ -51,9 +51,6 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
       - source-path: ws_secret.json
         destination-path: /eth-netstats/ws_secret.json
 task-runners:
-  - name: wait
-    script:
-      inline: sleep 600
   - name: geth-staticpeers-helper
     description: will gather the IP addresses and generate a static peers file.
     image: "gcr.io/whiteblock/helpers/besu/staticpeers:master"
@@ -64,7 +61,7 @@ task-runners:
     script: # if a script is specified here, it will overrun the image's startup command
       inline: ./besuStaticPeers generate -a '[{"publicKey":"04eab89943b5b2aa38745051471b31dc09d187c99b8fc6b740a8587ac43d1d65d644086a862189bc6298198453ba68076ebdb9cd7013d8893878f628a664376e"},{"publicKey":"a1ae7b1352fc0e02df6d75e90046d17fb212629a608f584760434df2375fb301ec9e55ac693a77f4bc0c3efdafec3b3853aa7cb2cb48480800ef6658f747d034"}]' -i '["'$GETH1_SERVICE0_COMMON_NETWORK'","'$GETH2_SERVICE0_COMMON_NETWORK'"]' >> /staticpeers/static-nodes.json
     resources: # specify the resources you'd like to allot to your service
-      cpus: 1
+      cpus: 4
       memory: 2 GB
       storage: 5 GiB
 tests: # here, specify the tests you'd like to run (a minimum of 1 test is required)
@@ -75,28 +72,20 @@ tests: # here, specify the tests you'd like to run (a minimum of 1 test is requi
         tasks: 
         - type: geth-staticpeers-helper
       - name: start
+        duration: 2h
         description: start the remaining node(s)
         system: 
-        - name: geth1 # name the service instance
-          type: geth1 # the type of service is the `name` of the service you specified in the services array
-          count: 1 # the number of instances of this service you'd like to provision for this test
+        - type: geth1 # the type of service is the `name` of the service you specified in the services array
           resources: # here, you can modify the resources you've specified for your service before, and you can specify which network(s) you'd like your service to be connected to
             networks: # if a network is not specified, the service will connect to the network called "default"
               - name: common-network
-        - name: geth2 # name the service instance
-          type: geth2 # the type of service is the `name` of the service you specified in the services array
-          count: 1 # the number of instances of this service you'd like to provision for this test
+        - type: geth2 # the type of service is the `name` of the service you specified in the services array
           resources: # here, you can modify the resources you've specified for your service before, and you can specify which network(s) you'd like your service to be connected to
             networks: # if a network is not specified, the service will connect to the network called "default"
               - name: common-network
-        - name: ethstats
-          type: ethstats
-          count: 1
+        - type: ethstats
           port-mappings:
             - "80:3000"
           resources: 
               networks:
                 - name: common-network
-      - name: wait
-        tasks: 
-        - type: wait
