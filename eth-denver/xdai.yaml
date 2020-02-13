@@ -1,0 +1,78 @@
+services:
+  - name: Parity1
+    image: gcr.io/whiteblock/xdai
+    resources:
+      cpus: 2
+      memory: 2 GB
+      storage: 10 GiB
+    script:
+      inline: parity --chain xdai --no-warp --jsonrpc-interface=0.0.0.0  --jsonrpc-port=8545 --jsonrpc-hosts=all --node-key=a4d359b9c17d908852c8aa3478d8fca8cf7a372c109061484d3f78992bf7eaa4 --bootnodes=enode://a1ae7b1352fc0e02df6d75e90046d17fb212629a608f584760434df2375fb301ec9e55ac693a77f4bc0c3efdafec3b3853aa7cb2cb48480800ef6658f747d034@${PARITY2_SERVICE0_PARITY_NETWORK}:30303,enode://579f786d4e2830bbcc02815a27e8a9bacccc9605df4dc6f20bcc1a6eb391e7225fff7cb83e5b4ecd1f3a94d8b733803f2f66b7e871961e7b029e22c155c3a778@${PARITY3_SERVICE0_PARITY_NETWORK}:30303,enode://3d9ca5956b38557aba991e31cf510d4df641dce9cc26bfeb7de082f0c07abb6ede3a58410c8f249dabeecee4ad3979929ac4c7c496ad20b8cfdd061b7401b4f5@${PARITY4_SERVICE0_PARITY_NETWORK}:30303
+  - name: Parity2
+    image: gcr.io/whiteblock/xdai
+    resources:
+      cpus: 2
+      memory: 2 GB
+      storage: 10 GiB
+    script:
+      inline: parity --chain xdai --no-warp --jsonrpc-interface=0.0.0.0 --jsonrpc-port=8545 --jsonrpc-hosts=all --node-key=f0fc159e1f89281607e8023524cdceb4046de2132cbec2ae272b1f396ade0fd9 --bootnodes=enode://04eab89943b5b2aa38745051471b31dc09d187c99b8fc6b740a8587ac43d1d65d644086a862189bc6298198453ba68076ebdb9cd7013d8893878f628a664376e@${PARITY1_SERVICE0_PARITY_NETWORK}:30303,enode://579f786d4e2830bbcc02815a27e8a9bacccc9605df4dc6f20bcc1a6eb391e7225fff7cb83e5b4ecd1f3a94d8b733803f2f66b7e871961e7b029e22c155c3a778@${PARITY3_SERVICE0_PARITY_NETWORK}:30303,enode://3d9ca5956b38557aba991e31cf510d4df641dce9cc26bfeb7de082f0c07abb6ede3a58410c8f249dabeecee4ad3979929ac4c7c496ad20b8cfdd061b7401b4f5@${PARITY4_SERVICE0_PARITY_NETWORK}:30303
+  - name: Parity3
+    image: gcr.io/whiteblock/xdai
+    resources:
+      cpus: 2
+      memory: 2 GB
+      storage: 10 GiB
+    script:
+      inline: parity --chain xdai --no-warp --jsonrpc-interface=0.0.0.0 --jsonrpc-port=8545 --jsonrpc-hosts=all --node-key=722f11686b2277dcbd72713d8a3c81c666b585c337d47f503c3c1f3c17cf001d --bootnodes=enode://04eab89943b5b2aa38745051471b31dc09d187c99b8fc6b740a8587ac43d1d65d644086a862189bc6298198453ba68076ebdb9cd7013d8893878f628a664376e@${PARITY1_SERVICE0_PARITY_NETWORK}:30303,enode://a1ae7b1352fc0e02df6d75e90046d17fb212629a608f584760434df2375fb301ec9e55ac693a77f4bc0c3efdafec3b3853aa7cb2cb48480800ef6658f747d034@${PARITY2_SERVICE0_PARITY_NETWORK}:30303,enode://3d9ca5956b38557aba991e31cf510d4df641dce9cc26bfeb7de082f0c07abb6ede3a58410c8f249dabeecee4ad3979929ac4c7c496ad20b8cfdd061b7401b4f5@${PARITY4_SERVICE0_PARITY_NETWORK}:30303
+  - name: Parity4
+    image: gcr.io/whiteblock/xdai
+    resources:
+      cpus: 2
+      memory: 2 GB
+      storage: 10 GiB
+    script:
+      inline: parity --chain xdai --no-warp --jsonrpc-interface=0.0.0.0 --jsonrpc-port=8545 --jsonrpc-hosts=all --node-key=6af685c4de99d44c620ccd9464d19bdeb62a750b9ae49b1740fb28d68a0e5c7d --bootnodes=enode://04eab89943b5b2aa38745051471b31dc09d187c99b8fc6b740a8587ac43d1d65d644086a862189bc6298198453ba68076ebdb9cd7013d8893878f628a664376e@${PARITY1_SERVICE0_PARITY_NETWORK}:30303,enode://a1ae7b1352fc0e02df6d75e90046d17fb212629a608f584760434df2375fb301ec9e55ac693a77f4bc0c3efdafec3b3853aa7cb2cb48480800ef6658f747d034@${PARITY2_SERVICE0_PARITY_NETWORK}:30303,enode://579f786d4e2830bbcc02815a27e8a9bacccc9605df4dc6f20bcc1a6eb391e7225fff7cb83e5b4ecd1f3a94d8b733803f2f66b7e871961e7b029e22c155c3a778@${PARITY3_SERVICE0_PARITY_NETWORK}:30303
+sidecars:
+  - name: splunk
+    sidecar-to:
+      - Parity1
+      - Parity2
+      - Parity3
+      - Parity4
+    image: gcr.io/whiteblock/splunk/ethereum/ethlogger
+    resources:
+      cpus: 2
+      memory: 4 GB
+      storage: 30 GiB
+    script:
+      inline:
+        ethlogger --eth-rpc-url=http://$SERVICE:8545 --trace
+    environment:
+      NETWORK_NAME: whiteblock
+      START_AT_BLOCK: latest
+      SPLUNK_HEC_URL: "https://splunk.whiteblock.io:8088"
+      SPLUNK_HEC_TOKEN: "f57efd39-f84d-470d-ae0e-ff0f67ee98c7"
+      SPLUNK_EVENTS_INDEX: main
+      SPLUNK_METRICS_INDEX: metrics
+      SPLUNK_INTERNAL_INDEX: metrics
+      SPLUNK_HEC_REJECT_INVALID_CERTS: "false"
+tests:
+  - name: run-parity
+    description: run 4 parity ethereum xdai nodes on a testnet
+    wait-for: infinite
+    system:
+      - type: Parity1
+        resources:
+          networks:
+            - name: parity-network
+      - type: Parity2
+        resources:
+          networks:
+            - name: parity-network
+      - type: Parity3
+        resources:
+          networks:
+            - name: parity-network
+      - type: Parity4
+        resources:
+          networks:
+            - name: parity-network
