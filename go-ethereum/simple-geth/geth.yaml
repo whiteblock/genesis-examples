@@ -52,7 +52,7 @@ task-runners:
       inline: sleep 600
   - name: geth-nodekey-helper
     description: generates nodekey files from json
-    image: "gcr.io/whiteblock/helpers/geth/nodekey:latest"
+    image: "gcr.io/whiteblock/helpers/geth/nodekey:master"
     input-files:
       - source-path: ./accounts.json
         destination-path: /geth/accounts.json
