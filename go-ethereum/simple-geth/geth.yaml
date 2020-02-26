@@ -14,10 +14,6 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
     input-files: # here, specify the files you'd like to include from the start
       - source-path: ./genesis.json # the source-path specified should be relative to the test definition file's location
         destination-path: /geth/genesis.json
-      - source-path: ./keystore/pk1
-        destination-path: /geth/keystore/pk
-      - source-path: ./keystore/pw.txt
-        destination-path: /geth/pw.txt
     resources: # specify the resources you'd like to allot to your service
       cpus: 2
       memory: 2 GB
@@ -37,10 +33,6 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
     input-files: # here, specify the files you'd like to include from the start
       - source-path: ./genesis.json # the source-path specified should be relative to the test definition file's location
         destination-path: /geth/genesis.json
-      - source-path: ./keystore/pk2
-        destination-path: /geth/keystore/pk
-      - source-path: ./keystore/pw.txt
-        destination-path: /geth/pw.txt
     resources: # specify the resources you'd like to allot to your service
       cpus: 1
       memory: 2 GB
@@ -64,15 +56,18 @@ task-runners:
       inline: /usr/bin/nodekey --file /geth/nodes.json --output /keystore
   - name: geth-keystore-helper
     description: generates keystore files from json account info
+    image: "grc.io/whiteblock/helpers/geth/keystore:master"
     input-files:
       - source-path: ./accounts.json
-        destination-path: /get/accounts.json
+        destination-path: /geth/accounts.json
+      - source-path: ./account-password.txt
+        destination: /geth/accounts-password.txt
     volumes:
       - path: /keystore/
         name: keystore
         scope: singleton
     script:
-      inline: /usr/bin/keystore --file /geth/accounts.json --output /keystore
+      inline: /usr/bin/keystore --skeys /geth/accounts.json --password /geth/accounts-password.txt --output /keystore
   - name: geth-staticpeers-helper
     description: will gather the IP addresses and generate a static peers file.
     image: "gcr.io/whiteblock/helpers/besu/staticpeers:master"
