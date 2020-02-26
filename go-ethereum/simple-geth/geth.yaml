@@ -10,7 +10,7 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
         name: keystore
         scope: singleton
     script: # if a script is specified here, it will overrun the image's startup command
-      inline: cp /staticpeers/static-nodes.json /geth/geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --etherbase 0 --unlock 0 --allow-insecure-unlock --password ./geth/pw.txt --mine --minerthreads=1 --nodekey=/keystore/nodekey1
+      inline: mkdir -p /geth/geth && cp /staticpeers/static-nodes.json /geth/geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --etherbase 0 --unlock 0 --allow-insecure-unlock --password ./geth/pw.txt --mine --minerthreads=1 --nodekey=/keystore/nodekey0
     input-files: # here, specify the files you'd like to include from the start
       - source-path: ./genesis.json # the source-path specified should be relative to the test definition file's location
         destination-path: /geth/genesis.json
@@ -33,7 +33,7 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
         name: keystore
         scope: singleton
     script: # if a script is specified here, it will overrun the image's startup command
-      inline: cp /staticpeers/static-nodes.json /geth/geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --etherbase 0 --unlock 0 --allow-insecure-unlock --password ./geth/pw.txt --mine --minerthreads=1 --nodekey=/keystore/nodekey2
+      inline: mkdir -p /geth/geth && cp /staticpeers/static-nodes.json /geth/geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --etherbase 0 --unlock 0 --allow-insecure-unlock --password ./geth/pw.txt --mine --minerthreads=1 --nodekey=/keystore/nodekey1
     input-files: # here, specify the files you'd like to include from the start
       - source-path: ./genesis.json # the source-path specified should be relative to the test definition file's location
         destination-path: /geth/genesis.json
