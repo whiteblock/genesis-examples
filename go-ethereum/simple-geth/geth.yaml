@@ -51,17 +51,28 @@ task-runners:
     script:
       inline: sleep 600
   - name: geth-nodekey-helper
-    description: generates nodekey files from json
+    description: generates nodekey files from json node info
     image: "gcr.io/whiteblock/helpers/geth/nodekey:master"
     input-files:
-      - source-path: ./accounts.json
-        destination-path: /geth/accounts.json
+      - source-path: ./nodes.json
+        destination-path: /geth/nodes.json
     volumes:
       - path: /keystore/
         name: keystore
         scope: singleton
     script:
-      inline: /usr/bin/nodekey --file /geth/accounts.json --output /keystore
+      inline: /usr/bin/nodekey --file /geth/nodes.json --output /keystore
+  - name: geth-keystore-helper
+    description: generates keystore files from json account info
+    input-files:
+      - source-path: ./accounts.json
+        destination-path: /get/accounts.json
+    volumes:
+      - path: /keystore/
+        name: keystore
+        scope: singleton
+    script:
+      inline: /usr/bin/keystore --file /geth/accounts.json --output /keystore
   - name: geth-staticpeers-helper
     description: will gather the IP addresses and generate a static peers file.
     image: "gcr.io/whiteblock/helpers/besu/staticpeers:master"
@@ -84,6 +95,7 @@ tests: # here, specify the tests you'd like to run (a minimum of 1 test is requi
         tasks:
         - type: geth-staticpeers-helper
         - type: geth-nodekey-helper
+        - type: geth-keystore-helper
       - name: start
         description: start the remaining node(s)
         system:
