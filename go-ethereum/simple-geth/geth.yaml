@@ -43,7 +43,7 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
       cpus: 1
       memory: 2 GB
       storage: 5 GiB
-  
+
 task-runners:
   - name: wait
     script:
@@ -64,14 +64,14 @@ task-runners:
 tests: # here, specify the tests you'd like to run (a minimum of 1 test is required)
   - name: geth_network_2_nodes # the name of the test
     description: first test - run two geth nodes on the common-network
-   
+
     phases:
       - name: create
-        tasks: 
+        tasks:
         - type: geth-staticpeers-helper
       - name: start
         description: start the remaining node(s)
-        system: 
+        system:
         - name: geth1 # name the service instance
           type: geth1 # the type of service is the `name` of the service you specified in the services array
           count: 1 # the number of instances of this service you'd like to provision for this test
@@ -85,5 +85,5 @@ tests: # here, specify the tests you'd like to run (a minimum of 1 test is requi
             networks: # if a network is not specified, the service will connect to the network called "default"
               - name: common-network
       - name: wait
-        tasks: 
+        tasks:
         - type: wait
