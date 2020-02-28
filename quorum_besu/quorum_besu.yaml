@@ -46,16 +46,13 @@ services:
       storage: 5 GiB
 task-runners:
   - name: static-peers # generate static peers for besu
-    image: "gcr.io/whiteblock/helpers/besu/staticpeers:master"
+    image: "gcr.io/whiteblock/helpers/ethereum/static-peers:master"
     volumes:
       - path: /staticpeers/
         name: staticpeers
         scope: singleton
     script:
-      inline:  ./besuStaticPeers generate -a '[{"publicKey":"ac6b1096ca56b9f6d004b779ae3728bf83f8e22453404cc3cef16a3d9b96608bc67c4b30db88e0a5a6c6390213f7acbe1153ff6d23ce57380104288ae19373ef"},{"publicKey":"0ba6b9f606a43a95edc6247cdb1c1e105145817be7bcafd6b2c0ba15d58145f0dc1a194f70ba73cd6f4cdd6864edc7687f311254c7555cc32e4d45aeb1b80416"},{"publicKey":"579f786d4e2830bbcc02815a27e8a9bacccc9605df4dc6f20bcc1a6eb391e7225fff7cb83e5b4ecd1f3a94d8b733803f2f66b7e871961e7b029e22c155c3a778"},{"publicKey":"3d9ca5956b38557aba991e31cf510d4df641dce9cc26bfeb7de082f0c07abb6ede3a58410c8f249dabeecee4ad3979929ac4c7c496ad20b8cfdd061b7401b4f5"},{"publicKey":"b0ec8003f44030987b8c994e06bd6517183ef633f35ce6f65af90a68d524ca64b8670044d633f9ab4c57291a2a3df2437664061759f809e735628db10b07803b"},{"publicKey":"e38b41307f4752121385c6f67cb4de0d59c1230127ef3722d25cc2a29363b9319cb5f9e4dc2b5c20754dddad43376547d5348191a54b7e4977631b62d5a15166"},{"publicKey":"42c581c1b4368f2dff8d76a1450e37af55fc9d4681354b3530974c85ddaef191f4179bda883d2d79b921741070d56894186fa2bc3ec6ea37e53b08d81b4fb47c"}]' --ip '["'$QUORUM1_SERVICE0_QUORUM_NETWORK'", "'$QUORUM2_SERVICE0_QUORUM_NETWORK'", "'$QUORUM3_SERVICE0_QUORUM_NETWORK'", "'$QUORUM4_SERVICE0_QUORUM_NETWORK'","'$BESU1_SERVICE0_QUORUM_NETWORK'", "'$BESU2_SERVICE0_QUORUM_NETWORK'", "'$BESU3_SERVICE0_QUORUM_NETWORK'"]' >> /staticpeers/static-nodes.json
-  - name: testnet-expiration
-    script:
-      inline: sleep 600
+      inline: generate -a ac6b1096ca56b9f6d004b779ae3728bf83f8e22453404cc3cef16a3d9b96608bc67c4b30db88e0a5a6c6390213f7acbe1153ff6d23ce57380104288ae19373ef -a 0ba6b9f606a43a95edc6247cdb1c1e105145817be7bcafd6b2c0ba15d58145f0dc1a194f70ba73cd6f4cdd6864edc7687f311254c7555cc32e4d45aeb1b80416 -a 579f786d4e2830bbcc02815a27e8a9bacccc9605df4dc6f20bcc1a6eb391e7225fff7cb83e5b4ecd1f3a94d8b733803f2f66b7e871961e7b029e22c155c3a778 -a 3d9ca5956b38557aba991e31cf510d4df641dce9cc26bfeb7de082f0c07abb6ede3a58410c8f249dabeecee4ad3979929ac4c7c496ad20b8cfdd061b7401b4f5 -a b0ec8003f44030987b8c994e06bd6517183ef633f35ce6f65af90a68d524ca64b8670044d633f9ab4c57291a2a3df2437664061759f809e735628db10b07803b -a e38b41307f4752121385c6f67cb4de0d59c1230127ef3722d25cc2a29363b9319cb5f9e4dc2b5c20754dddad43376547d5348191a54b7e4977631b62d5a15166 -a 42c581c1b4368f2dff8d76a1450e37af55fc9d4681354b3530974c85ddaef191f4179bda883d2d79b921741070d56894186fa2bc3ec6ea37e53b08d81b4fb47c -i $QUORUM_SERVICE0_QUORUM_NETWORK -i $QUORUM_SERVICE1_QUORUM_NETWORK -i $QUORUM_SERVICE2_QUORUM_NETWORK -i $QUORUM_SERVICE3_QUORUM_NETWORK -i $BESU_SERVICE0_QUORUM_NETWORK -i $BESU_SERVICE1_QUORUM_NETWORK -i $BESU_SERVICE2_QUORUM_NETWORK >> /staticpeers/static-nodes.json
 tests:
   - name: testnet
     description: run a Quorum-Besu testnet
@@ -63,8 +60,8 @@ tests:
       - name: generate-static-peers
         tasks:
           - type: static-peers
-            timeout: 2 m
       - name: run-testnet
+        duration: 15m
         system:
           - type: Quorum
             count: 4
@@ -77,13 +74,8 @@ tests:
               networks:
                 - name: quorum-network
           - type: ethstats
-            count: 1
             port-mappings:
               - "80:3000"
             resources:
               networks:
                 - name: quorum-network
-      - name: testnet-expiration
-        tasks:
-          - type: testnet-expiration
-            timeout: 600s
