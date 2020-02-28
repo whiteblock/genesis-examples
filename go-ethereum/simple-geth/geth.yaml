@@ -13,6 +13,7 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
       inline: >
         mkdir -p /geth/geth
         && cp /staticpeers/static-nodes.json /geth/geth/static-nodes.json
+        && cp -r /keystore /geth/keystore
         && geth --nousb --datadir ./geth/ init /geth/genesis.json
         && geth \
           --datadir ./geth/ \
@@ -56,6 +57,7 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
       inline: >
         mkdir -p /geth/geth
         && cp /staticpeers/static-nodes.json /geth/geth/static-nodes.json
+        && cp -r /keystore /geth/keystore
         && geth --nousb --datadir ./geth/ init /geth/genesis.json
         && geth \
           --datadir ./geth/ \
