@@ -67,7 +67,7 @@ task-runners:
         name: keystore
         scope: singleton
     script:
-      inline: /usr/bin/keystore --skeys /geth/accounts.json --password /geth/accounts-password.txt --output /keystore
+      inline: /usr/bin/keystore --file /geth/accounts.json --password /geth/accounts-password.txt --output /keystore
   - name: geth-staticpeers-helper
     description: will gather the IP addresses and generate a static peers file.
     image: "gcr.io/whiteblock/helpers/besu/staticpeers:master"
