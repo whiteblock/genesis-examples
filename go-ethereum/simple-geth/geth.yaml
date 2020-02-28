@@ -119,6 +119,10 @@ task-runners:
         scope: singleton
     script:
       inline: /usr/bin/keystore --file /geth/accounts.json --password /geth/password.txt --output /keystore
+    resources: # keystore needs extra computation resources to run its task
+      cpus: 1
+      memory: 2 GB
+      storage: 5 GiB
   - name: geth-staticpeers-helper
     description: will gather the IP addresses and generate a static peers file.
     image: "gcr.io/whiteblock/helpers/besu/staticpeers:master"
