@@ -14,6 +14,8 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
     input-files: # here, specify the files you'd like to include from the start
       - source-path: ./genesis.json # the source-path specified should be relative to the test definition file's location
         destination-path: /geth/genesis.json
+      - source-path: ./password.txt
+        destination-path: /geth/password.txt
     resources: # specify the resources you'd like to allot to your service
       cpus: 2
       memory: 2 GB
@@ -33,6 +35,8 @@ services: # here, specify the type of service(s) you'd like to test -- in the co
     input-files: # here, specify the files you'd like to include from the start
       - source-path: ./genesis.json # the source-path specified should be relative to the test definition file's location
         destination-path: /geth/genesis.json
+      - source-path: ./password.txt
+        destination-path: /geth/password.txt
     resources: # specify the resources you'd like to allot to your service
       cpus: 1
       memory: 2 GB
@@ -60,14 +64,14 @@ task-runners:
     input-files:
       - source-path: ./accounts.json
         destination-path: /geth/accounts.json
-      - source-path: ./accounts-password.txt
-        destination-path: /geth/accounts-password.txt
+      - source-path: ./password.txt
+        destination-path: /geth/password.txt
     volumes:
       - path: /keystore/
         name: keystore
         scope: singleton
     script:
-      inline: /usr/bin/keystore --file /geth/accounts.json --password /geth/accounts-password.txt --output /keystore
+      inline: /usr/bin/keystore --file /geth/accounts.json --password /geth/password.txt --output /keystore
   - name: geth-staticpeers-helper
     description: will gather the IP addresses and generate a static peers file.
     image: "gcr.io/whiteblock/helpers/besu/staticpeers:master"
