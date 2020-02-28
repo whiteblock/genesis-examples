@@ -2,30 +2,12 @@ services:
   - name: nginx
     image: nginx:alpine
     resources:
-      cpus: 1
       memory: 500 MB
-      storage: 1 GiB
-task-runners:
-  - name: wait-10-minutes
-    script:
-      inline: sleep 600
 tests:
   - name: serve-static-files
     description: Serve the default static content of the nginx image.
+    wait-for: 10m
     system:
-      - name: nginx
-        type: nginx
-        count: 1
+      - type: nginx
         port-mappings:
           - "80:80"
-    phases:
-      - name: testnet
-        system:
-          - type: nginx
-            name: nginx
-            resources:
-              networks:
-                - name: nginx
-        tasks:
-          - type: wait-10-minutes
-            timeout: 600s
