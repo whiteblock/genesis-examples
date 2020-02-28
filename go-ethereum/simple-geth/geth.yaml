@@ -56,7 +56,7 @@ task-runners:
       inline: /usr/bin/nodekey --file /geth/nodes.json --output /keystore
   - name: geth-keystore-helper
     description: generates keystore files from json account info
-    image: "grc.io/whiteblock/helpers/geth/keystore:master"
+    image: "gcr.io/whiteblock/helpers/geth/keystore:master"
     input-files:
       - source-path: ./accounts.json
         destination-path: /geth/accounts.json
