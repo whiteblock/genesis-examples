@@ -60,8 +60,8 @@ task-runners:
     input-files:
       - source-path: ./accounts.json
         destination-path: /geth/accounts.json
-      - source-path: ./account-password.txt
-        destination: /geth/accounts-password.txt
+      - source-path: ./accounts-password.txt
+        destination-path: /geth/accounts-password.txt
     volumes:
       - path: /keystore/
         name: keystore
