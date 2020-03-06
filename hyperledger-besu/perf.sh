@@ -5,8 +5,13 @@ WAIT_TIME=3m
 
 NODES=10
 VAL_DIV=2
+
+# number of validators
 VAL=5
+
+# number of accounts to create
 ACCOUNTS=1000
+
 BPS=10
 RTS=10
 BANDWIDTH=1000
@@ -35,9 +40,9 @@ run_experiment() {
 
     for tps in $(seq $START_TPS $TPS_DELTA $END_TPS); do
         TPS=$tps
-    
+
         start_bn=$(wb get block number)
-    
+
         $COMMAND netconfig all -d $DELAY -b $BANDWIDTH -m $LIMIT -l $LOSS
         $COMMAND tx start stream --tps $TPS -v 1
 
@@ -55,11 +60,11 @@ run_experiment() {
         echo "tps=$TPS" >>log.txt
         echo "stats collection: $(($start_bn+$START_OFFSET)) $(($start_bn+$END_OFFSET))"
         wb get stats block "$(($start_bn+$START_OFFSET))" "$(($start_bn+$END_OFFSET))" >>log.json
-    
+
         wb tx stop
         wb netconfig clear
     done
-    
+
     wb export
     $COMMAND done
     cd ..
