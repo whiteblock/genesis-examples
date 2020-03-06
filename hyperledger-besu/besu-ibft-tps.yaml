@@ -62,6 +62,8 @@ task-runners:
         scope: singleton
     script:
       inline:  ./besuStaticPeers generate -a '[{"publicKey":"b0ec8003f44030987b8c994e06bd6517183ef633f35ce6f65af90a68d524ca64b8670044d633f9ab4c57291a2a3df2437664061759f809e735628db10b07803b"},{"publicKey":"e38b41307f4752121385c6f67cb4de0d59c1230127ef3722d25cc2a29363b9319cb5f9e4dc2b5c20754dddad43376547d5348191a54b7e4977631b62d5a15166"},{"publicKey":"42c581c1b4368f2dff8d76a1450e37af55fc9d4681354b3530974c85ddaef191f4179bda883d2d79b921741070d56894186fa2bc3ec6ea37e53b08d81b4fb47c"}]' --ip '["'$BESU1_SERVICE0_BESU_NETWORK'", "'$BESU2_SERVICE0_BESU_NETWORK'", "'$BESU3_SERVICE0_BESU_NETWORK'"]' >> /staticpeers/static-nodes.json
+  - name: tx
+    image: "gcr.io/whiteblock/helpers/ethereum/tx:master"
 tests:
   - name: baseline
     description: run a simple hyperledger besu testnet consisting of 3 besu nodes
@@ -78,6 +80,7 @@ tests:
             resources:
               networks:
                 - name: besu-network
+                  bandwidth: 10 Mbyte
           - name: besu2
             type: besu2
             count: 1
@@ -94,3 +97,6 @@ tests:
         tasks:
           - type: testnet-expiration
             timeout: 600 s
+# START_TPS=180
+# END_TPS=250
+# TPS_DELTA=20
