@@ -2,10 +2,10 @@ services:
   - name: besu1
     image: "hyperledger/besu:1.3.6-SNAPSHOT"
     script:
-      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE
+      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis-onboarding.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE
     input-files:
-      - source-path: ./genesis.json
-        destination-path: /var/lib/besu/genesis.json
+      - source-path: ./genesis-onboarding.json
+        destination-path: /var/lib/besu/genesis-onboarding.json
       - source-path: ./keystore/pk1
         destination-path: /var/lib/besu/key
     volumes:
@@ -19,10 +19,10 @@ services:
   - name: besu2
     image: "hyperledger/besu:1.3.6-SNAPSHOT"
     script:
-      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE
+      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis-onboarding.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE
     input-files:
-      - source-path: ./genesis.json
-        destination-path: /var/lib/besu/genesis.json
+      - source-path: ./genesis-onboarding.json
+        destination-path: /var/lib/besu/genesis-onboarding.json
       - source-path: ./keystore/pk2
         destination-path: /var/lib/besu/key
     volumes:
@@ -36,10 +36,10 @@ services:
   - name: besu3
     image: "hyperledger/besu:1.3.6-SNAPSHOT"
     script:
-      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE
+      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis-onboarding.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE
     input-files:
-      - source-path: ./genesis.json
-        destination-path: /var/lib/besu/genesis.json
+      - source-path: ./genesis-onboarding.json
+        destination-path: /var/lib/besu/genesis-onboarding.json
       - source-path: ./keystore/pk3
         destination-path: /var/lib/besu/key
     volumes:
