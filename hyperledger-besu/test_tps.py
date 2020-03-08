@@ -15,7 +15,7 @@ class Biome:
     def __init__(self, domain_name):
         self.domain_name = domain_name
 
-        # there isn't currently a way to get
+        # there isn't currently a way to get the external ip from genesis-cli
         # so ask a dns server that should be one of (if not) the first
         # to get the record
         # Sample output:
