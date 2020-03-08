@@ -58,7 +58,6 @@ def genesis_run():
         cmd = shlex.split(f"genesis run {yaml_path} --no-await --dev")
     else:
         cmd = shlex.split(f"genesis run {yaml_path} --no-await")
-    # send this to background? or should genesis have a detach feature?
     proc = subprocess.run(cmd, check=True, capture_output=True, encoding='utf-8')   # noqa: E501
 
     # Sample output:
@@ -71,7 +70,6 @@ def genesis_run():
     lines = proc.stdout.splitlines()
     test_id = lines[-1].split(':')[-1].strip()
     print(f'test_id: {test_id}')
-    # it would be faster to get the ip address than to wait for dns
     domain_name = lines[-2].strip()
     biome = Biome(domain_name)
     print(f'biome: {biome.domain_name} {biome.external_ip}')
