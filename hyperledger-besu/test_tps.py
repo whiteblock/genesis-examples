@@ -12,9 +12,6 @@ DEV = False
 
 
 class Biome:
-    # pick a google owned dns server that quickly receive new A records
-    dns_server = 'ns-cloud-d1.googledomains.com'
-
     def __init__(self, domain_name):
         self.domain_name = domain_name
 
