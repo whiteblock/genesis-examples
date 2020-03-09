@@ -2,7 +2,7 @@ services:
   - name: besu1
     image: "hyperledger/besu:1.3.6-SNAPSHOT"
     script:
-      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis-ibft.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE --rpc-http-enabled --rpc-http-host=0.0.0.0
+      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis-ibft.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE --rpc-http-enabled --rpc-http-host=0.0.0.0 --host-whitelist='*'
     input-files:
       - source-path: ./genesis-ibft.json
         destination-path: /var/lib/besu/genesis-ibft.json
