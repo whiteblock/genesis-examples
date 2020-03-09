@@ -1,45 +1,47 @@
 """
-assumes you have dig and geth
+assumes you have geth installed
 """
 import pathlib
 import shlex
 import subprocess
 import time
 
+import dns.resolver
 import pytest
 
 DEV = False
+RESOLVER = dns.resolver.Resolver()
 
 
 class Biome:
+    resolver = dns.resolver.Resolver()
+    dns_servers = [
+        'ns-cloud-c1.googledomains.com',   # DEV
+        'ns-cloud-d1.googledomains.com'   # PROD
+    ]
+    resolver.nameservers = [
+        item.address for server in dns_servers for item in RESOLVER.query(server)   # noqa: E501
+    ]
+
     def __init__(self, domain_name):
         self.domain_name = domain_name
 
-        # there isn't currently a way to get the external ip from genesis-cli
-        # so ask a dns server that should be one of (if not) the first
-        # to get the record
-        # Sample output:
-        # $ dig +noall +answer @ns-cloud-d1.googledomains.com foemulberry-0.biomes.whiteblock.io  # noqa: E501
-        # foemulberry-0.biomes.whiteblock.io. 5 IN A      35.188.227.206
-        if DEV:
-            cmd = f'dig +noall +answer @ns-cloud-c1.googledomains.com {domain_name}'  # noqa: E501
-        else:
-            cmd = f'dig +noall +answer @ns-cloud-d1.googledomains.com {domain_name}'  # noqa: E501
         tries = 20
         for i in range(tries):
-            proc = subprocess.run(
-                shlex.split(cmd),
-                check=True,
-                capture_output=True,
-                encoding='utf-8'
-            )
-            # eg 'foemulberry-0.biomes.whiteblock.io. 5 IN A\t35.188.227.206\n'
-            # or '' if no record is found
-            if proc.stdout:
-                ipaddr = proc.stdout.split('\t')[1].strip()
-                self.external_ip = ipaddr
+            # there isn't currently a way to get the external ip from
+            # genesis-cli so ask a dns server that should be one of
+            # (if not) the first to get the record
+            try:
+                answer = self.resolver.query(domain_name, 'a')
+            except dns.resolver.NoNameservers:   # occurs when resolution fails
+                if i == tries - 1:
+                    raise
+                else:
+                    time.sleep(i)
+                    continue
+            else:
+                self.external_ip = answer.rrset.items[0].address
                 break
-            time.sleep(i)
         else:
             msg = f"failed to resolve {domain_name} via {self.dns_server}"
             raise AssertionError(msg)
@@ -69,10 +71,13 @@ def genesis_run():
     #         ID: 2b49713a-0e2e-4cfe-80b4-2096adef1e5d
     lines = proc.stdout.splitlines()
     test_id = lines[-1].split(':')[-1].strip()
+    print('\n')   # begin logging with a fresh newline
     print(f'test_id: {test_id}')
     domain_name = lines[-2].strip()
     biome = Biome(domain_name)
-    print(f'biome: {biome.domain_name} {biome.external_ip}')
+    print(f'biome: ')
+    print(f'  name: {biome.domain_name}')
+    print(f'  external-ip: {biome.external_ip}')
     yield GenesisRun(test_id, biome)
 
 
