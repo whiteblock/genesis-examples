@@ -13,7 +13,7 @@ services:
         name: staticpeers
         scope: singleton
     resources:
-      cpus: 2
+      cpus: 1
       memory: 3 GB
       storage: 5 GiB
   - name: besu2
@@ -30,7 +30,7 @@ services:
         name: staticpeers
         scope: singleton
     resources:
-      cpus: 2
+      cpus: 1
       memory: 3 GB
       storage: 5 GiB
   - name: besu3
@@ -47,9 +47,78 @@ services:
         name: staticpeers
         scope: singleton
     resources:
-      cpus: 2
+      cpus: 1
       memory: 3 GB
       storage: 5 GiB
+  - name: besu4
+    image: "hyperledger/besu:1.3.6-SNAPSHOT"
+    script:
+      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis-ibft.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE
+    input-files:
+      - source-path: ./genesis-ibft.json
+        destination-path: /var/lib/besu/genesis-ibft.json
+      - source-path: ./keystore/pk4
+        destination-path: /var/lib/besu/key
+    volumes:
+      - path: /staticpeers/
+        name: staticpeers
+        scope: singleton
+    resources:
+      cpus: 1
+      memory: 3 GB
+      storage: 5 GiB
+  - name: besu5
+    image: "hyperledger/besu:1.3.6-SNAPSHOT"
+    script:
+      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis-ibft.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE
+    input-files:
+      - source-path: ./genesis-ibft.json
+        destination-path: /var/lib/besu/genesis-ibft.json
+      - source-path: ./keystore/pk5
+        destination-path: /var/lib/besu/key
+    volumes:
+      - path: /staticpeers/
+        name: staticpeers
+        scope: singleton
+    resources:
+      cpus: 1
+      memory: 3 GB
+      storage: 5 GiB
+  - name: besu6
+    image: "hyperledger/besu:1.3.6-SNAPSHOT"
+    script:
+      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis-ibft.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE
+    input-files:
+      - source-path: ./genesis-ibft.json
+        destination-path: /var/lib/besu/genesis-ibft.json
+      - source-path: ./keystore/pk6
+        destination-path: /var/lib/besu/key
+    volumes:
+      - path: /staticpeers/
+        name: staticpeers
+        scope: singleton
+    resources:
+      cpus: 1
+      memory: 3 GB
+      storage: 5 GiB
+  - name: besu7
+    image: "hyperledger/besu:1.3.6-SNAPSHOT"
+    script:
+      inline: cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json && besu --genesis-file=/var/lib/besu/genesis-ibft.json --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000  --discovery-enabled=false --p2p-port 30303 --data-path=/var/lib/besu --node-private-key-file=/var/lib/besu/key --logging=TRACE
+    input-files:
+      - source-path: ./genesis-ibft.json
+        destination-path: /var/lib/besu/genesis-ibft.json
+      - source-path: ./keystore/pk7
+        destination-path: /var/lib/besu/key
+    volumes:
+      - path: /staticpeers/
+        name: staticpeers
+        scope: singleton
+    resources:
+      cpus: 1
+      memory: 3 GB
+      storage: 5 GiB
+
 task-runners:
   - name: testnet-expiration
     script:
@@ -92,7 +161,32 @@ tests:
             resources:
               networks:
                 - name: besu-network
-      - name: testnet-expiration
+          - name: besu4
+            type: besu4
+            count: 1
+            port-mappings:
+              - "8545:8545"
+            resources:
+              networks:
+                - name: besu-network
+          - name: besu5
+            type: besu5
+            count: 1
+            resources:
+              networks:
+                - name: besu-network
+          - name: besu6
+            type: besu6
+            count: 1
+            resources:
+              networks:
+                - name: besu-network
+          - name: besu7
+            type: besu7
+            count: 1
+            resources:
+              networks:
+                - name: besu-network
         tasks:
           - type: testnet-expiration
             timeout: 600 s
