@@ -122,15 +122,15 @@ services:
     image: gcr.io/whiteblock/helpers/ethereum/tx:master
     script:
       inline: >
-      /usr/bin/tx
-      --tps=1
-      --private-key=5d07b874ec190c444ed1a39a6104a1eaafab1e5837c259f520c3ae2e287c857d
-      --destination=0xb8172dc7230f3b84787331a976218d57735b65bb
-      --value=0.1
-      --chain-id=2018
-      --target=besu-service0:8545
-      --gas-price=0x1fff
-      --gas-limit=0x1fffffffffff
+        /usr/bin/tx
+        --tps=1
+        --private-key=5d07b874ec190c444ed1a39a6104a1eaafab1e5837c259f520c3ae2e287c857d
+        --destination=0xb8172dc7230f3b84787331a976218d57735b65bb
+        --value=0.1
+        --chain-id=2018
+        --target=besu-service0:8545
+        --gas-price=0x1fff
+        --gas-limit=0x1fffffffffff
 task-runners:
   - name: testnet-expiration
     script:
