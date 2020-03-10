@@ -124,13 +124,29 @@ task-runners:
     script:
       inline: sleep 600
   - name: static-peers # generate static peers
-    image: "gcr.io/whiteblock/helpers/besu/staticpeers:master"
+    image: "gcr.io/whiteblock/helpers/ethereum/static-peers:master"
     volumes:
       - path: /staticpeers/
         name: staticpeers
         scope: singleton
     script:
-      inline:  ./besuStaticPeers generate -a '[{"publicKey":"b0ec8003f44030987b8c994e06bd6517183ef633f35ce6f65af90a68d524ca64b8670044d633f9ab4c57291a2a3df2437664061759f809e735628db10b07803b"},{"publicKey":"e38b41307f4752121385c6f67cb4de0d59c1230127ef3722d25cc2a29363b9319cb5f9e4dc2b5c20754dddad43376547d5348191a54b7e4977631b62d5a15166"},{"publicKey":"42c581c1b4368f2dff8d76a1450e37af55fc9d4681354b3530974c85ddaef191f4179bda883d2d79b921741070d56894186fa2bc3ec6ea37e53b08d81b4fb47c"}]' --ip '["'$BESU1_SERVICE0_BESU_NETWORK'", "'$BESU2_SERVICE0_BESU_NETWORK'", "'$BESU3_SERVICE0_BESU_NETWORK'"]' >> /staticpeers/static-nodes.json
+      inline: >
+        generate
+        -a b0ec8003f44030987b8c994e06bd6517183ef633f35ce6f65af90a68d524ca64b8670044d633f9ab4c57291a2a3df2437664061759f809e735628db10b07803b
+        -a e38b41307f4752121385c6f67cb4de0d59c1230127ef3722d25cc2a29363b9319cb5f9e4dc2b5c20754dddad43376547d5348191a54b7e4977631b62d5a15166
+        -a 42c581c1b4368f2dff8d76a1450e37af55fc9d4681354b3530974c85ddaef191f4179bda883d2d79b921741070d56894186fa2bc3ec6ea37e53b08d81b4fb47c
+        -a 5d82eaf30b69304b42ffd8d1b8b6b17f885ac6ec54a094e3623699d065d18a80efc9a86e48e38da3355ce3743d753f08d993280e003f1c83e4366954d1ec914b
+        -a 161958ede62d9c7b9843a78a18ae1c96aa273571f601266f36cfba3fc546dbe08ad894eb599b935cde1c05113d75c1755d06c3c9f3659e10dcc8e478b17ef559
+        -a 841f99a94609140cb84f30902b134ff861b096ab5ad71284fa655ee6e41f87021b12158bfece8460b03a4cc86493702b0d52226536aff09634046849235f6774
+        -a 813cc18fc460b24b9242bcf9ca248cb8523de886aafca498f43cf6b5c7b9375b9907c40560bcb9c73acb0408082457d1b3aff476917ac9254336030638ee1f24
+        -i $BESU1_SERVICE0_BESU_NETWORK
+        -i $BESU2_SERVICE0_BESU_NETWORK
+        -i $BESU3_SERVICE0_BESU_NETWORK
+        -i $BESU4_SERVICE0_BESU_NETWORK
+        -i $BESU5_SERVICE0_BESU_NETWORK
+        -i $BESU6_SERVICE0_BESU_NETWORK
+        -i $BESU7_SERVICE0_BESU_NETWORK
+        >> /staticpeers/static-nodes.json
 tests:
   - name: baseline
     description: run a simple hyperledger besu testnet consisting of 3 besu nodes
