@@ -149,7 +149,7 @@ task-runners:
         >> /staticpeers/static-nodes.json
 tests:
   - name: baseline
-    description: run a simple hyperledger besu testnet consisting of 3 besu nodes
+    description: run a BFT/POA hyperledger besu testnet consisting of 7 besu nodes
     phases:
       - name: genesis
         tasks:
