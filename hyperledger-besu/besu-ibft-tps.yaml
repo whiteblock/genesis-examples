@@ -128,7 +128,7 @@ services:
         --destination=0xb8172dc7230f3b84787331a976218d57735b65bb
         --value=0.1
         --chain-id=2018
-        --target=besu-service0:8545
+        --target=$BESU1_SERVICE0_BESU_NETWORK:8545
         --gas-price=0x1fff
         --gas-limit=0x1fffffffffff
 task-runners:
