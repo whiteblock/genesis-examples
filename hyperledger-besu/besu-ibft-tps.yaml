@@ -9,61 +9,25 @@ services:
     image: "hyperledger/besu:latest"
     script:
       inline: >
-        cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json &&
         besu
         --genesis-file=/var/lib/besu/genesis-ibft.json
         --miner-enabled
         --miner-coinbase=0x0000000000000000000000000000000000000000
-        --discovery-enabled=false
-        --p2p-port 30303
+        --p2p-port=30303
         --data-path=/var/lib/besu
         --node-private-key-file=/var/lib/besu/key
         --logging=TRACE
-        --bootnodes enode://445ccb3bb6427be8c2b471490ab31d75d1a7f014681f8753fef63401cbb58c6722eba18d280311f4071b9a489436aa13cd2929ca7f2b611b29339aeade2ffbae@${BOOTNODE_SERVICE0_BESU_NETWORK}
+        --bootnodes=enode://445ccb3bb6427be8c2b471490ab31d75d1a7f014681f8753fef63401cbb58c6722eba18d280311f4071b9a489436aa13cd2929ca7f2b611b29339aeade2ffbae@${BOOTNODE_SERVICE0_BESU_NETWORK}:30301
+        --rpc-http-enabled
+        --rpc-http-host=0.0.0.0
+        --host-whitelist='*'
     input-files:
       - source-path: ./genesis-ibft.json
         destination-path: /var/lib/besu/genesis-ibft.json
       - source-path: ./keystore/pk$_n
         destination-path: /var/lib/besu/key
-    volumes:
-      - path: /staticpeers/
-        name: staticpeers
-        scope: singleton
     resources:
-      cpus: 1
       memory: 3 GB
-      storage: 5 GiB
-  - name: besu-exposed-port
-    image: "hyperledger/besu:latest"
-    script:
-      inline: >
-        cp /staticpeers/static-nodes.json /var/lib/besu/static-nodes.json &&
-        besu
-        --genesis-file=/var/lib/besu/genesis-ibft.json
-        --miner-enabled
-        --miner-coinbase=0x0000000000000000000000000000000000000000
-        --discovery-enabled=false
-        --p2p-port 30303
-        --data-path=/var/lib/besu
-        --node-private-key-file=/var/lib/besu/key
-        --logging=TRACE
-        --rpc-http-enabled
-        --rpc-http-host=0.0.0.0
-        --host-whitelist='*'
-        --bootnodes enode://445ccb3bb6427be8c2b471490ab31d75d1a7f014681f8753fef63401cbb58c6722eba18d280311f4071b9a489436aa13cd2929ca7f2b611b29339aeade2ffbae@${BOOTNODE_SERVICE0_BESU_NETWORK}
-    input-files:
-      - source-path: ./genesis-ibft.json
-        destination-path: /var/lib/besu/genesis-ibft.json
-      - source-path: ./keystore/pk6
-        destination-path: /var/lib/besu/key
-    volumes:
-      - path: /staticpeers/
-        name: staticpeers
-        scope: singleton
-    resources:
-      cpus: 1
-      memory: 3 GB
-      storage: 5 GiB
   - name: transactor
     image: gcr.io/whiteblock/helpers/ethereum/tx:master
     script:
@@ -74,13 +38,10 @@ services:
         --destination=0xb8172dc7230f3b84787331a976218d57735b65bb
         --value=0.1
         --chain-id=2018
-        --target=$BESU1_SERVICE0_BESU_NETWORK:8545
+        --target=$BESU_SERVICE0_BESU_NETWORK:8545
         --gas-price=0x1fff
         --gas-limit=0x1fffffffffff
 task-runners:
-  - name: testnet-expiration
-    script:
-      inline: sleep 600
 tests:
   - name: baseline
     description: run a BFT/POA hyperledger besu testnet consisting of 7 besu nodes
@@ -88,33 +49,19 @@ tests:
       - name: setup-bootnode
         duration: 10 s
         system:
-          - name: bootnode
-            type: bootnode
-            count: 1
+          - type: bootnode
             resources:
               networks:
                 - name: besu-network
       - name: spin-up-nodes
         duration: 10 m
         system:
-          - name: besu
-            type: besu
-            count: 6
+          - type: besu
+            count: 7
             resources:
               networks:
                 - name: besu-network
-          # expose http rpc port externally for a single node
-          - name: besu-exposed-port
-            type: besu
-            count: 1
-            port-mappings:
-              - "8545:8545"
-            resources:
-              networks:
-                - name: besu-network
-          - name: transactor
-            type: transactor
-            count: 1
+          - type: transactor
             resources:
               networks:
                 - name: besu-network
