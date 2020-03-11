@@ -1,10 +1,26 @@
 services:
   - name: bootnode
-    image: gcr.io/whiteblock/geth:master
+    image: "hyperledger/besu:latest"
     resources:
       memory: 1GB
     script:
-      inline: bootnode -nodekeyhex 14d8419dd7d20d7437576789d25a614b5a835bfbf9e4843ef9135597530c573b
+      inline:
+        besu
+        --genesis-file=/var/lib/besu/genesis-ibft.json
+        --miner-enabled
+        --miner-coinbase=0x0000000000000000000000000000000000000000
+        --p2p-port=30303
+        --data-path=/var/lib/besu
+        --node-private-key-file=/var/lib/besu/key
+        --logging=TRACE
+        --rpc-http-enabled
+        --rpc-http-host=0.0.0.0
+        --host-whitelist='*'
+    input-files:
+      - source-path: ./genesis-ibft.json
+        destination-path: /var/lib/besu/genesis-ibft.json
+      - source-path: ./keystore/pk-boot
+        destination-path: /var/lib/besu/key
   - name: besu
     image: "hyperledger/besu:latest"
     script:
@@ -17,7 +33,7 @@ services:
         --data-path=/var/lib/besu
         --node-private-key-file=/var/lib/besu/key
         --logging=TRACE
-        --bootnodes=enode://445ccb3bb6427be8c2b471490ab31d75d1a7f014681f8753fef63401cbb58c6722eba18d280311f4071b9a489436aa13cd2929ca7f2b611b29339aeade2ffbae@${BOOTNODE_SERVICE0_BESU_NETWORK}:30301
+        --bootnodes=enode://445ccb3bb6427be8c2b471490ab31d75d1a7f014681f8753fef63401cbb58c6722eba18d280311f4071b9a489436aa13cd2929ca7f2b611b29339aeade2ffbae@${BOOTNODE_SERVICE0_BESU_NETWORK}:30303
         --rpc-http-enabled
         --rpc-http-host=0.0.0.0
         --host-whitelist='*'
@@ -57,7 +73,7 @@ tests:
         duration: 10 m
         system:
           - type: besu
-            count: 7
+            count: 6
             resources:
               networks:
                 - name: besu-network
