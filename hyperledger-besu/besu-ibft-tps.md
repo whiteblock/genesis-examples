@@ -31,12 +31,12 @@ Project: adcdcc66-d4c4-47b7-aed2-cbe28c3681d3
 $ geth attach http://pythonseed-0.biomes.whiteblock.io:8545 --exec eth.blockNumber
 ```
 
-## Modifying/Adding Nodes
+## Creating/Modifying Nodes
 Proof-of-Authority/iBFT networks require encoding the nodes that are authorized to
 produce blocks into the genesis file.
 
-### Creating Accounts
-Use the `gcr.io/whiteblock/ethereum/accounts:master` helper to create a json list of
+### Step 1: Creating Accounts
+Use the `gcr.io/whiteblock/ethereum/accounts:master` helper to create a json list of test accounts.
 ```
 $ docker run --rm -it gcr.io/whiteblock/helpers/ethereum/accounts:master generate
 [{'address': '0xbb7aec51c32b2d5649f3cb2c6a0273a705aed03b',
@@ -47,7 +47,7 @@ $ docker run --rm -it gcr.io/whiteblock/helpers/ethereum/accounts:master generat
   'publicKey': 'e2bc6b60bd15bf20e09d1e77d1e31b8b4d1d60444aa244ec5901203b706b2c3e4de44f8e90e488101cdcc8b894ecaa6928125cca3e38acd1a49613602bda86d4'}]
 ```
 
-### Use generated addresses to populate the extraData genesis field
+### Step 2: Use generated addresses to populate the extraData genesis field
 use the address field to populate a json list of authoritative nodes:
 ```
 # toEncode.json
@@ -68,7 +68,7 @@ Following the directions [here](./https://besu.hyperledger.org/en/stable/HowTo/C
 $ docker run -v $(pwd):/src --workdir /src --rm -it hyperledger/besu:latest rlp encode --from=toEncode-ibft.json
 ```
 
-### Create private key files
+### Step 3: Create private key files
 finally, create a file in the [keystore](./keystore) directory for each private key
 
 Note: prepend `0x`, e.g.:
