@@ -1,31 +1,6 @@
 services:
-  - name: multigeth_boot_node
-    description: this service runs the multi-geth bootnode
-    image: multigeth/multi-geth
-    script:
-      inline: |
-        cp /staticpeers/static-nodes.json /geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --ethstats Node1:etc_testnet_secret@ethstats-service0:3000 --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,db,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --mine --minerthreads=1 --verbosity 5
-    volumes:
-      - path: /staticpeers/
-        name: staticpeers
-        scope: singleton
-    input-files:
-      - source-path: ./genesis.json
-        destination-path: /geth/genesis.json
-      - source-path: ./keystore/pk2
-        destination-path: /geth/keystore/pk
-      - source-path: ./keystore/pw.txt
-        destination-path: /geth/pw.txt
-      - source-path: ./keystore/nodekey1
-        destination-path: /geth/nodekey
-      - source-path: ./keystore/static-nodes.json
-        destination-path: /geth/static-nodes.json
-    resources:
-      cpus: 1
-      memory: 2 GB
-      storage: 5 GiB
-  - name: multigeth_nodes
-    description: these are the additional multi-geth nodes that will be added to the testnet
+  - name: multigeth_node
+    description: these are the multi-geth nodes that will be added to the testnet
     image: multigeth/multi-geth
     volumes:
       - path: /staticpeers/
@@ -34,17 +9,15 @@ services:
     input-files:
       - source-path: ./genesis.json
         destination-path: /geth/genesis.json
-      - source-path: ./keystore/pk2
+      - source-path: ./keystore/pk$_n
         destination-path: /geth/keystore/pk
       - source-path: ./keystore/pw.txt
         destination-path: /geth/pw.txt
-      - source-path: ./keystore/nodekey2
+      - source-path: ./keystore/nodekey$_n
         destination-path: /geth/nodekey
-      - source-path: ./keystore/static-nodes.json
-        destination-path: /geth/static-nodes.json
     script:
       inline: |
-        cp /staticpeers/static-nodes.json /geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --ethstats Node2:etc_testnet_secret@ethstats-service0:3000 --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,db,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --mine --minerthreads=1 --verbosity 5
+        cp /staticpeers/static-nodes.json /geth/static-nodes.json && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --rpc --nodiscover --ethstats $NAME:etc_testnet_secret@ethstats-service0:3000 --rpcaddr 0.0.0.0 --miner.gasprice=1 --rpcapi "admin,web3,db,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --txpool.nolocals --rpcvhosts=* --port 30303 --networkid 555555 --nousb --mine --minerthreads=1 --verbosity 5
   - name: ethstats
     image: gcr.io/whiteblock/ethstats:master
     environment:
@@ -63,9 +36,7 @@ task-runners:
     script:
       inline: ./besuStaticPeers generate -a '[{"publicKey":"04eab89943b5b2aa38745051471b31dc09d187c99b8fc6b740a8587ac43d1d65d644086a862189bc6298198453ba68076ebdb9cd7013d8893878f628a664376e"},{"publicKey":"a1ae7b1352fc0e02df6d75e90046d17fb212629a608f584760434df2375fb301ec9e55ac693a77f4bc0c3efdafec3b3853aa7cb2cb48480800ef6658f747d034"}]' --ip '["'$MULTIGETH_BOOT_NODE_SERVICE0_COMMON_NETWORK'", "'$MULTIGETH_NODES_SERVICE0_COMMON_NETWORK'"]'  >> /staticpeers/static-nodes.json
     resources:
-      cpus: 1
       memory: 2 GB
-      storage: 5 GiB
 tests:
   - name: start-multigeth
     description: first test - run three multigeth nodes on the common-network
@@ -75,24 +46,15 @@ tests:
           - type: geth-staticpeers-helper
             timeout: 3 m
       - name: start
-        description: start the remaining node(s)
+        description: start the nodes
         duration: 10 m
         system:
-          - name: multigeth_boot_node
-            type: multigeth_boot_node
-            count: 1
+          - type: multigeth_nodes
+            count: 2
             resources:
               networks:
                 - name: common-network
-          - name: multigeth_nodes
-            type: multigeth_nodes
-            count: 1
-            resources:
-              networks:
-                - name: common-network
-          - name: ethstats
-            type: ethstats
-            count: 1
+          - type: ethstats
             port-mappings:
               - "80:3000"
             resources:
