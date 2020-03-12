@@ -57,7 +57,6 @@ services:
         --target=$BESU_SERVICE0_BESU_NETWORK:8545
         --gas-price=0x1fff
         --gas-limit=0x1fffffffffff
-task-runners:
 tests:
   - name: baseline
     description: run a BFT/POA hyperledger besu testnet consisting of 7 besu nodes
