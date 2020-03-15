@@ -1,0 +1,82 @@
+services:
+  - name: bootnode
+    image: "hyperledger/besu:latest"
+    resources:
+      memory: 1GB
+    script:
+      inline:
+        besu
+        --genesis-file=/var/lib/besu/genesis-pow.json
+        --miner-enabled
+        --miner-coinbase=0x0000000000000000000000000000000000000000
+        --p2p-port=30303
+        --data-path=/var/lib/besu
+        --node-private-key-file=/var/lib/besu/key
+        --logging=TRACE
+        --rpc-http-enabled
+        --rpc-http-host=0.0.0.0
+        --host-whitelist='*'
+    input-files:
+      - source-path: ./genesis-pow.json
+        destination-path: /var/lib/besu/genesis-ibft.json
+      - source-path: ./keystore/pk-boot
+        destination-path: /var/lib/besu/key
+  - name: besu
+    image: "hyperledger/besu:latest"
+    script:
+      inline: >
+        besu
+        --genesis-file=/var/lib/besu/genesis-pow.json
+        --miner-enabled
+        --miner-coinbase=0x0000000000000000000000000000000000000000
+        --p2p-port=30303
+        --data-path=/var/lib/besu
+        --node-private-key-file=/var/lib/besu/key
+        --logging=TRACE
+        --bootnodes=enode://74ccafe2182af87c6eb6ce9f59f94c83f305880b029f23d1e54f89f31197e2b01145e98aa2ad2837aa323e8d32b516992d4808a1a46f5bcc0c4081202a57e5a1@${BOOTNODE_SERVICE0_BESU_NETWORK}:30303
+        --rpc-http-enabled
+        --rpc-http-host=0.0.0.0
+        --host-whitelist='*'
+    input-files:
+      - source-path: ./genesis-pow.json
+        destination-path: /var/lib/besu/genesis-pow.json
+      - source-path: ./keystore/pk$_n
+        destination-path: /var/lib/besu/key
+    resources:
+      memory: 3 GB
+  # - name: transactor
+  #   image: gcr.io/whiteblock/helpers/ethereum/tx:master
+  #   script:
+  #     inline: >
+  #       /usr/bin/tx
+  #       --tps=1
+  #       --private-key=5d07b874ec190c444ed1a39a6104a1eaafab1e5837c259f520c3ae2e287c857d
+  #       --destination=0xb8172dc7230f3b84787331a976218d57735b65bb
+  #       --value=0.1
+  #       --chain-id=2018
+  #       --target=$BESU_SERVICE0_BESU_NETWORK:8545
+  #       --gas-price=0x1fff
+  #       --gas-limit=0x1fffffffffff
+tests:
+  - name: baseline
+    description: run a proof-of-work hyperledger besu testnet consisting of 3 besu nodes
+    phases:
+      - name: setup-bootnode
+        duration: 10 s
+        system:
+          - type: bootnode
+            resources:
+              networks:
+                - name: besu-network
+      - name: spin-up-nodes
+        duration: 10 m
+        system:
+          - type: besu
+            count: 2
+            resources:
+              networks:
+                - name: besu-network
+          # - type: transactor
+          #   resources:
+          #     networks:
+          #       - name: besu-network
