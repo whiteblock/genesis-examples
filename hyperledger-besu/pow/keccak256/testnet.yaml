@@ -29,7 +29,7 @@ services:
         besu
         --genesis-file=/var/lib/besu/genesis.json
         --miner-enabled
-        --miner-coinbase=0x0000000000000000000000000000000000000000
+        --miner-coinbase="$(cat /var/lib/besu/addr)"
         --p2p-port=30303
         --data-path=/var/lib/besu
         --node-private-key-file=/var/lib/besu/key
@@ -43,6 +43,8 @@ services:
         destination-path: /var/lib/besu/genesis.json
       - source-path: ./keystore/pk$_n
         destination-path: /var/lib/besu/key
+      - source-path: ./keystore/addr$_n
+        destination-path: /var/lib/besu/addr
     resources:
       cpu: 2
       memory: 4 GB
