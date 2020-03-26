@@ -2,7 +2,7 @@ services:
   - name: bootnode
     image: "gcr.io/whiteblock/besu:keccak256"
     resources:
-      cpu: 2
+      cpus: 2
       memory: 4 GB
     script:
       inline:
@@ -46,7 +46,7 @@ services:
       - source-path: ./keystore/addr$_n
         destination-path: /var/lib/besu/addr
     resources:
-      cpu: 2
+      cpus: 2
       memory: 4 GB
   # - name: transactor
   #   image: gcr.io/whiteblock/helpers/ethereum/tx:master

@@ -2,7 +2,7 @@ services:
   - name: bootnode
     image: "hyperledger/besu:latest"
     resources:
-      cpu: 2
+      cpus: 2
       memory: 4 GB
     script:
       inline:
@@ -44,7 +44,7 @@ services:
       - source-path: ./keystore/pk$_n
         destination-path: /var/lib/besu/key
     resources:
-      cpu: 2
+      cpus: 2
       memory: 4 GB
   # - name: transactor
   #   image: gcr.io/whiteblock/helpers/ethereum/tx:master
