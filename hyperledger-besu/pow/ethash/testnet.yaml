@@ -1,7 +1,6 @@
 services:
   - name: bootnode
-    # image: "hyperledger/besu:latest"
-    image: "gcr.io/whiteblock/besu:keccak256"
+    image: "hyperledger/besu:latest"
     resources:
       memory: 1GB
     script:
@@ -23,8 +22,7 @@ services:
       - source-path: ./keystore/pk-boot
         destination-path: /var/lib/besu/key
   - name: besu
-    # image: "hyperledger/besu:latest"
-    image: "gcr.io/whiteblock/besu:keccak256"
+    image: "hyperledger/besu:latest"
     script:
       inline: >
         besu
