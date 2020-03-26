@@ -9,7 +9,7 @@ services:
         besu
         --genesis-file=/var/lib/besu/genesis.json
         --miner-enabled
-        --miner-coinbase=0x0000000000000000000000000000000000000000
+        --miner-coinbase=0xb32bbe0883f8062497acc738ebb2f71e656db135
         --p2p-port=30303
         --data-path=/var/lib/besu
         --node-private-key-file=/var/lib/besu/key
@@ -34,7 +34,7 @@ services:
         --data-path=/var/lib/besu
         --node-private-key-file=/var/lib/besu/key
         --logging=TRACE
-        --bootnodes=enode://74ccafe2182af87c6eb6ce9f59f94c83f305880b029f23d1e54f89f31197e2b01145e98aa2ad2837aa323e8d32b516992d4808a1a46f5bcc0c4081202a57e5a1@${BOOTNODE_SERVICE0_BESU_NETWORK}:30303
+        --bootnodes=enode://dcc582ff8b387a7613f3d0532c6a94b7f0aa936ed8e3ba606df3f47b69bf34a99d8e77a5de33ec076a270af32c0542fed02dd10ae361e31a7f29de6c13b1457e@${BOOTNODE_SERVICE0_BESU_NETWORK}:30303
         --rpc-http-enabled
         --rpc-http-host=0.0.0.0
         --host-whitelist='*'
