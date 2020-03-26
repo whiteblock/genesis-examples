@@ -1,7 +1,7 @@
 {
   "config": {
       "constantinoplefixblock": 0,
-      "ethash": {
+      "keccak256pow": {
         "fixeddifficulty": 1000
       },
        "chainID": 1942
