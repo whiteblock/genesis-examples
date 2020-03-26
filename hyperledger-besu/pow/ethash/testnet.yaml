@@ -67,6 +67,9 @@ tests:
         duration: 10 s
         system:
           - type: bootnode
+            port-mappings:
+              - "8545:8545"
+              - "30303:30303"
             resources:
               networks:
                 - name: besu-network
