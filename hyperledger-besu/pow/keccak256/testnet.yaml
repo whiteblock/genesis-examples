@@ -2,7 +2,8 @@ services:
   - name: bootnode
     image: "gcr.io/whiteblock/besu:keccak256"
     resources:
-      memory: 1GB
+      cpu: 2
+      memory: 4 GB
     script:
       inline:
         besu
@@ -43,7 +44,8 @@ services:
       - source-path: ./keystore/pk$_n
         destination-path: /var/lib/besu/key
     resources:
-      memory: 3 GB
+      cpu: 2
+      memory: 4 GB
   # - name: transactor
   #   image: gcr.io/whiteblock/helpers/ethereum/tx:master
   #   script:
