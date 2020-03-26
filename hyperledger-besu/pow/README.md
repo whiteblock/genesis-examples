@@ -1,3 +1,7 @@
+# Proof-of-Work Besu Examples
+- [ethash](./ethash)
+- [keccak256](./keccak256)
+
 # Creating custom POW-network
 ## 1. Create node identities
 ```
