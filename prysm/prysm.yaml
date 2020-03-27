@@ -1,18 +1,18 @@
 services:
-  - name: prysm-beacon
-    image: gcr.io/prysmaticlabs/prysm/beacon-chain:latest
+  - name: eth1-mock-rpc
+    image: gcr.io/whiteblock/eth1-mock-rpc:latest
     args:
-      - --datadir=/data
-      - --init-sync-no-verify
-    resources:
-      cpus: 2
-      memory: 2 GB
-      storage: 5 GiB
+      - --unencrypted-keys-dir=/keys
+      - --genesis-deposits 64
+      - --prompt-for-deposits=false
+    input-files:
+      - source-path: ./keystore/keys.json
+        destination-path: /keys/keys.json
 tests:
   - name: simple-prysm-exercise
     description: run a prysm testnet and validate some blocks
     wait-for: 10m
     system:
-      - name: beacon-node-testnet
-        type: prysm-beacon
-        count: 4
+      - name: eth1-mock-rpc
+        type: eth1-mock-rpc
+        count: 1
