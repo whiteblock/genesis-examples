@@ -6,7 +6,7 @@ services:
     script:
       inline:
         besu
-        --genesis-file=/var/lib/besu/genesis-ibft.json
+        --genesis-file=/var/lib/besu/genesis.json
         --miner-enabled
         --miner-coinbase=0x0000000000000000000000000000000000000000
         --p2p-port=30303
@@ -17,8 +17,8 @@ services:
         --rpc-http-host=0.0.0.0
         --host-whitelist='*'
     input-files:
-      - source-path: ./genesis-ibft.json
-        destination-path: /var/lib/besu/genesis-ibft.json
+      - source-path: ./genesis.json
+        destination-path: /var/lib/besu/genesis.json
       - source-path: ./keystore/pk-boot
         destination-path: /var/lib/besu/key
   - name: besu
@@ -26,7 +26,7 @@ services:
     script:
       inline: >
         besu
-        --genesis-file=/var/lib/besu/genesis-ibft.json
+        --genesis-file=/var/lib/besu/genesis.json
         --miner-enabled
         --miner-coinbase=0x0000000000000000000000000000000000000000
         --p2p-port=30303
@@ -38,8 +38,8 @@ services:
         --rpc-http-host=0.0.0.0
         --host-whitelist='*'
     input-files:
-      - source-path: ./genesis-ibft.json
-        destination-path: /var/lib/besu/genesis-ibft.json
+      - source-path: ./genesis.json
+        destination-path: /var/lib/besu/genesis.json
       - source-path: ./keystore/pk$_n
         destination-path: /var/lib/besu/key
     resources:
