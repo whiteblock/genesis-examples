@@ -26,6 +26,8 @@ services:
         --contract-deployment-block=2000
         --min-sync-peers=0
         --verbosity debug
+        --interop-num-validators=64
+        --interop-genesis-time=0
         --bootstrap-node=
     resources:
       cpus: 2
