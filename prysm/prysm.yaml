@@ -1,4 +1,5 @@
 services:
+  # see: https://github.com/prysmaticlabs/eth1-mock-rpc
   - name: eth1
     image: gcr.io/whiteblock/eth1-mock-rpc:latest
     script:
@@ -29,7 +30,18 @@ services:
     resources:
       cpus: 2
       memory: 4 GB
-
+  - name: validator
+    image: gcr.io/whiteblock/prysm/validator:latest
+    script:
+      inline: >
+        /usr/local/bin/validator
+        --password 123456
+        --unencrypted-keys=/keys/keys.json
+        --minimal-config
+        --beacon-rpc-provider=${BEACON_CHAIN_SERVICE0_PRYSM_NETWORK}:4000
+    input-files:
+      - source-path: ./keystore/keys.json
+        destination-path: /keys/keys.json
 tests:
   - name: simple-prysm-exercise
     description: run a prysm testnet and validate some blocks
@@ -42,9 +54,16 @@ tests:
               networks:
                 - name: prysm-network
       - name: start-beacon-chain
-        duration: 10 m
+        duration: 10 s
         system:
           - type: beacon-chain
+            resources:
+              networks:
+                - name: prysm-network
+      - name: start-validator
+        duration: 10 m
+        system:
+          - type: validator
             resources:
               networks:
                 - name: prysm-network

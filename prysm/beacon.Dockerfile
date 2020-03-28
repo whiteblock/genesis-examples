@@ -9,4 +9,6 @@ FROM gcr.io/whiteblock/base:ubuntu1804
 
 COPY --from=builder /src/bazel-bin/beacon-chain/linux_amd64_stripped/beacon-chain /usr/local/bin/
 
+EXPOSE 4000
+
 ENTRYPOINT ["/usr/local/bin/beacon-chain"]
