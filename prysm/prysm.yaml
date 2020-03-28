@@ -23,7 +23,7 @@ services:
         --minimal-config
         --custom-genesis-delay 12
         --datadir /tmp/beacondata
-        --contract-deployment-block=0
+        --contract-deployment-block=2000
         --min-sync-peers=0
         --verbosity debug
         --bootstrap-node=
