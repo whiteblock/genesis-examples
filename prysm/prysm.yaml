@@ -1,5 +1,5 @@
 services:
-  - name: eth1-mock-rpc
+  - name: eth1
     image: gcr.io/whiteblock/eth1-mock-rpc:latest
     script:
       inline: >
@@ -7,14 +7,42 @@ services:
         --unencrypted-keys-dir=/keys
         --genesis-deposits 64
         --prompt-for-deposits=false
+        --host=0.0.0.0
     input-files:
       - source-path: ./keystore/keys.json
         destination-path: /keys/keys.json
+  - name: beacon-chain
+    image: gcr.io/whiteblock/prysm/beacon-chain:latest
+    script:
+      inline: >
+        /src/bazel-bin/beacon-chain/linux_amd64_stripped/beacon-chain
+        --http-web3provider http://${ETH1_SERVICE0_PRYSM_NETWORK}:7777
+        --web3provider ws://${ETH1_SERVICE0_PRYSM_NETWORK}:7778
+        --force-clear-db
+        --minimal-config
+        --custom-genesis-delay 12
+        --datadir /tmp/beacondata
+        --contract-deployment-block=0
+        --min-sync-peers=0
+        --verbosity debug
+        --bootstrap-node=
+    resources:
+      cpus: 2
+      memory: 4 GB
+
 tests:
   - name: simple-prysm-exercise
     description: run a prysm testnet and validate some blocks
-    wait-for: 10m
-    system:
-      - name: eth1-mock-rpc
-        type: eth1-mock-rpc
-        count: 1
+    phases:
+      - name: start-mock-eth1-chain
+        type: eth1
+        duration: 10 s
+        resources:
+          networks:
+            - name: prysm-network
+      - name: start-beacon-chain
+        type: beacon-chain
+        duration: 10 m
+        resources:
+          networks:
+            - name: prysm-network
