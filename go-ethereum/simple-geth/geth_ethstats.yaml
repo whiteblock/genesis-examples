@@ -60,7 +60,7 @@ sidecars:
       NETWORK_NAME: whiteblock
       START_AT_BLOCK: latest
       SPLUNK_HEC_URL: "https://splunk.whiteblock.io:8088"
-      SPLUNK_HEC_TOKEN: "f57efd39-f84d-470d-ae0e-ff0f67ee98c7"
+      SPLUNK_HEC_TOKEN: "d1b8059a-3b66-4fa4-9a72-4d75b009caaa"
       SPLUNK_EVENTS_INDEX: main
       SPLUNK_METRICS_INDEX: metrics
       SPLUNK_INTERNAL_INDEX: metrics
@@ -91,6 +91,7 @@ tests:
         - type: geth-staticpeers-helper
       - name: start
         description: start the remaining node(s)
+        duration: 6000s
         system: 
         - name: geth1 
           type: geth1 
@@ -108,7 +109,4 @@ tests:
           resources: 
             networks: 
               - name: common-network
-      - name: wait
-        tasks: 
-        - type: wait
-          timeout: 6000s
+
