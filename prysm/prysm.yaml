@@ -5,48 +5,67 @@ services:
     script:
       inline: >
         /usr/local/bin/eth1-mock-rpc
-        --unencrypted-keys-dir=/keys
+        --unencrypted-keys-dir /keys
         --genesis-deposits 64
-        --prompt-for-deposits=false
-        --host=0.0.0.0
+        --host=0.0.0.0 
+        --prompt-for-deposits=false # note: last two options are custom
     input-files:
-      - source-path: ./keystore/keys.json
-        destination-path: /keys/keys.json
+      - source-path: ./build/validator_keys.json
+        destination-path: /keys/validator_keys.json
   - name: beacon-chain
-    image: gcr.io/whiteblock/prysm/beacon:latest
+    image: gcr.io/whiteblock/prysm/beacon-chain:latest
     script:
       inline: >
         /usr/local/bin/beacon-chain
         --http-web3provider http://${ETH1_SERVICE0_PRYSM_NETWORK}:7777
         --web3provider ws://${ETH1_SERVICE0_PRYSM_NETWORK}:7778
-        --force-clear-db
-        --minimal-config
-        --custom-genesis-delay 12
-        --datadir /tmp/beacondata
-        --contract-deployment-block=2000
-        --min-sync-peers=0
-        --verbosity debug
-        --interop-num-validators=64
-        --interop-genesis-time=0
         --bootstrap-node=
+        --datadir /tmp/beacondata
+        --interop-eth1data-votes
+        --interop-genesis-state /tmp/genesis.ssz
+        --minimal-config
     resources:
       cpus: 2
       memory: 4 GB
-  - name: validator
+  - name: validator0
     image: gcr.io/whiteblock/prysm/validator:latest
     script:
       inline: >
         /usr/local/bin/validator
-        --password 123456
-        --unencrypted-keys=/keys/keys.json
-        --minimal-config
+        --keymanager=interop
+        --keymanageropts='{"index": 0, "keys": 1}'
         --beacon-rpc-provider=${BEACON_CHAIN_SERVICE0_PRYSM_NETWORK}:4000
-    input-files:
-      - source-path: ./keystore/keys.json
-        destination-path: /keys/keys.json
+        --minimal-config
+  - name: validator1
+    image: gcr.io/whiteblock/prysm/validator:latest
+    script:
+      inline: >
+        /usr/local/bin/validator
+        --keymanager=interop
+        --keymanageropts='{"index": 1, "keys": 1}'
+        --beacon-rpc-provider=${BEACON_CHAIN_SERVICE0_PRYSM_NETWORK}:4000
+        --minimal-config
+  - name: validator2
+    image: gcr.io/whiteblock/prysm/validator:latest
+    script:
+      inline: >
+        /usr/local/bin/validator
+        --keymanager=interop
+        --keymanageropts='{"index": 2, "keys": 1}'
+        --beacon-rpc-provider=${BEACON_CHAIN_SERVICE0_PRYSM_NETWORK}:4000
+        --minimal-config
+  - name: validator3
+    image: gcr.io/whiteblock/prysm/validator:latest
+    script:
+      inline: >
+        /usr/local/bin/validator
+        --keymanager=interop
+        --keymanageropts='{"index": 3, "keys": 1}'
+        --beacon-rpc-provider=${BEACON_CHAIN_SERVICE0_PRYSM_NETWORK}:4000
+        --minimal-config
 tests:
   - name: simple-prysm-exercise
-    description: run a prysm testnet and validate some blocks
+    description: run a prysm testnet and partition validators
     phases:
       - name: start-mock-eth1-chain
         duration: 10 s
@@ -55,17 +74,46 @@ tests:
             resources:
               networks:
                 - name: prysm-network
-      - name: start-beacon-chain
-        duration: 10 s
-        system:
           - type: beacon-chain
             resources:
               networks:
                 - name: prysm-network
       - name: start-validator
-        duration: 10 m
+        duration: 20 s
         system:
-          - type: validator
+          - type: validator0
             resources:
               networks:
                 - name: prysm-network
+          - type: validator1
+            resources:
+              networks:
+                - name: prysm-network
+          - type: validator2
+            resources:
+              networks:
+                - name: prysm-network
+          - type: validator3
+            resources:
+              networks:
+                - name: prysm-network
+      - name: partition
+        duration: 20 s
+        description: split the network in half
+        system:
+          - type: validator0
+            resources:
+              networks:
+                - name: prysm-network
+          - type: validator1
+            resources:
+              networks:
+                - name: prysm-network
+          - type: validator2
+            resources:
+              networks:
+                - name: alt-network
+          - type: validator3
+            resources:
+              networks:
+                - name: alt-network

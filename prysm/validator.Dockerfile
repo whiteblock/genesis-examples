@@ -3,7 +3,7 @@ FROM gcr.io/prysmaticlabs/build-agent as builder
 COPY prysm /src
 WORKDIR /src
 
-RUN bazel build //validator --jobs=auto --verbose_failures
+RUN bazel build //validator:validator --define=ssz=minimal
 
 FROM gcr.io/whiteblock/base:ubuntu1804
 
