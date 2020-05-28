@@ -1,0 +1,96 @@
+services:
+  # see: https://github.com/prysmaticlabs/eth1-mock-rpc
+  - name: eth1
+    image: gcr.io/whiteblock/eth1-mock-rpc:v1
+    script:
+      inline: >
+        /usr/local/bin/eth1-mock-rpc
+        --unencrypted-keys-dir /keys
+        --genesis-deposits 4
+        --host=0.0.0.0 
+        --prompt-for-deposits=false # note: last two options are custom
+    input-files:
+      - source-path: ./build/validator_keys.json
+        destination-path: /keys/validator_keys.json
+  - name: beacon-chain
+    image: gcr.io/whiteblock/prysm/beacon-chain:v1
+    script:
+      inline: >
+        sleep 1 &&
+        /usr/local/bin/genesis-state-gen 
+        --output-ssz=/tmp/genesis.ssz 
+        --num-validators=4 
+        --mainnet-config=false &&
+        /usr/local/bin/beacon-chain
+        --no-discovery
+        --http-web3provider http://${ETH1_SERVICE0_PRYSM_NETWORK}:7777
+        --web3provider ws://${ETH1_SERVICE0_PRYSM_NETWORK}:7778
+        --bootstrap-node=
+        --datadir /tmp/beacondata
+        --interop-num-validators 4
+        --interop-eth1data-votes
+        --interop-genesis-state /tmp/genesis.ssz
+        --minimal-config
+        --min-sync-peers=0
+        --verbosity debug
+        --contract-deployment-block=0 &
+        sed -i '5s/.*/  host: "'"${POSTGRES_SERVICE0_PRYSM_NETWORK}"'"/' /tmp/beaconchain-explorer-config.yaml && 
+        cd /eth2-beaconchain-explorer/bin/ &&
+        sleep 15 &&
+        ./explorer -config /tmp/beaconchain-explorer-config.yaml
+    resources:
+      cpus: 2
+      memory: 4 GB
+    input-files:
+      - source-path: ./beaconchain-explorer-config.yaml
+        destination-path: /tmp/beaconchain-explorer-config.yaml
+  - name: postgres
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: "mysecretpassword"
+    script:
+      inline: >
+        /docker-entrypoint.sh postgres &
+        sleep 10 &&
+        su postgres -c 'psql -f /tmp/tables.sql' &&
+        sleep 9999
+    input-files:
+      - source-path: ./tables.sql
+        destination-path: /tmp/tables.sql
+  - name: validator0
+    image: gcr.io/whiteblock/prysm/validator:v1
+    script:
+      inline: >
+        sleep 5 &&
+        /usr/local/bin/validator
+        --keymanager=interop
+        --keymanageropts='{"index": 0, "keys": 4}'
+        --beacon-rpc-provider=${BEACON_CHAIN_SERVICE0_PRYSM_NETWORK}:4000
+        --minimal-config
+        --disable-protect-attester
+        --disable-protect-proposer
+tests:
+  - name: simple-prysm-exercise
+    description: run a prysm testnet and partition validators
+    phases:
+      - name: start-mock-eth1-chain
+        duration: 420 s
+        system:
+          - type: eth1
+            resources:
+              networks:
+                - name: prysm-network
+          - type: postgres
+            resources:
+              networks:
+                - name: prysm-network
+          - type: beacon-chain
+            port-mappings:
+              - "3333:3333"
+            resources:
+              networks:
+                - name: prysm-network
+          - type: validator0
+            resources:
+              networks:
+                - name: prysm-network

@@ -11,7 +11,7 @@ import json
 CURVE_ORDER = 52435875175126190479447740508185965837690552500527637822603658699938581184513
 
 # Number of keys to generate
-NUM_KEYS = 64
+NUM_KEYS = 4
 
 
 def int_to_hex(n: int, byte_length: int = None) -> str:

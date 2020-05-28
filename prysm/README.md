@@ -5,3 +5,8 @@ a minimal config that only requires 64 validator deposits for the beacon chain t
 
 # NOTE:
 You need to clone this repo recursively to build the validator and beacon chain images
+
+# TODO:
+ * add eth1-mock-rpc submodule due to dependency
+ * add eth2-beaconchain-explorer submodule due to dependency
+ * update prysm submodule version
