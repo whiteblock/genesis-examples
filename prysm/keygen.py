@@ -7,6 +7,7 @@ from eth_utils import (
 )
 import base64
 import json
+import os
 
 CURVE_ORDER = 52435875175126190479447740508185965837690552500527637822603658699938581184513
 
@@ -51,5 +52,7 @@ if __name__ == '__main__':
     validator_keys = {
         'keys': keypairs
     }
+
+    os.makedirs(os.path.dirname('./build/validator_keys.json'), exist_ok=True)
     with open('./build/validator_keys.json', 'w') as f:
         json.dump(validator_keys, f, indent=4)
