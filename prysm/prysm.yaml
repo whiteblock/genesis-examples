@@ -113,7 +113,7 @@ services:
         --disable-protect-proposer
 tests:
   - name: simple-prysm-exercise
-    description: run a prysm testnet and partition validators
+    description: run a prysm testnet
     phases:
       - name: start-mock-eth1-chain
         duration: 4 s
@@ -155,23 +155,3 @@ tests:
             resources:
               networks:
                 - name: prysm-network
-      # - name: partition
-      #   duration: 20 s
-      #   description: split the network in half
-      #   system:
-      #     - type: validator0
-      #       resources:
-      #         networks:
-      #           - name: prysm-network
-      #     - type: validator1
-      #       resources:
-      #         networks:
-      #           - name: prysm-network
-      #     - type: validator2
-      #       resources:
-      #         networks:
-      #           - name: alt-network
-      #     - type: validator3
-      #       resources:
-      #         networks:
-      #           - name: alt-network
