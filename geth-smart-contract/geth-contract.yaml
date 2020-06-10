@@ -16,7 +16,6 @@ services:
         cpus: 4
         memory: 6 GB
         storage: 30 GiB
-task-runners: 
     - name: smart-contract-compiler
       image: "zcole/truffle"
       script: 
@@ -30,12 +29,17 @@ tests:
     - name: geth_network_2_nodes 
       phases:
         - name: start
-          duration: infinite
           system: 
           - type: geth
             count: 2
             resources: 
               networks: 
                 - name: common-network
-  
+        - name: not-start
+          duration: infinite
+          system: 
+            - type: smart-contract-compiler
+              resources: 
+                networks: 
+                  - name: common-network
   
