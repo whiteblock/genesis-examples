@@ -1,4 +1,5 @@
-FROM node:13.12.0-alpine
+FROM ethereum/client-go:alltools-latest
+RUN apk add npm tmux
 RUN npm install -g truffle --unsafe-perm 
 WORKDIR /contract
 RUN truffle init -y
