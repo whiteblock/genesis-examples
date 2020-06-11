@@ -25,6 +25,8 @@ services:
           destination-path: /contract/
         - source-path: ./storage.sol
           destination-path: /contract/
+      resources:
+        memory: 6 GB
 tests: 
     - name: geth_network_2_nodes 
       phases:
