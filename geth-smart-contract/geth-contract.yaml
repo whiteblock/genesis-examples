@@ -17,7 +17,7 @@ services:
         memory: 6 GB
         storage: 30 GiB
     - name: smart-contract-compiler
-      image: "zcole/truffle:geth"
+      image: "zcole/truffle:latest"
       script: 
         inline: tmux new-session truffle && truffle compile && tmux send-keys -t "sleep 30 && truffle deploy" C-m && geth --nousb --datadir ./geth/ init /geth/genesis.json && geth --datadir ./geth/ --http --http.addr 0.0.0.0 --miner.gasprice=1 --http.api "admin,web3,eth,net,personal,miner,txpool" --http.corsdomain "0.0.0.0" --txpool.nolocals --http.vhosts=* --verbosity=5 --port 30303 --networkid 555555 --nousb --etherbase 0 --unlock 0 --allow-insecure-unlock --password ./geth/pw.txt --mine --miner.threads=6 --ethstats $NAME:secret@35.224.188.142:9002 --bootnodes enode://04eab89943b5b2aa38745051471b31dc09d187c99b8fc6b740a8587ac43d1d65d644086a862189bc6298198453ba68076ebdb9cd7013d8893878f628a664376e@${GETH_SERVICE0_COMMON_NETWORK}:30303?discport=30303 
       input-files: 
