@@ -15,7 +15,7 @@ services:
   - name: polkadot-ui
     image: gcr.io/whiteblock/polkadot-js/apps:latest
     environment:
-      WS_URL: ws://0.0.0.0:9944
+      WS_URL: ws://$_host:9944
 tests:
   - name: simple-substrate-exercise
     description: run a susbrate private testnet
@@ -53,6 +53,34 @@ tests:
             resources:
               networks:
                 - name: substrate-network
+          # - name: node4
+          #   type: substrate
+          #   environment:
+          #     NODE_INDEX: 4
+          #   resources:
+          #     networks:
+          #       - name: substrate-network
+          # - name: node5
+          #   type: substrate
+          #   environment:
+          #     NODE_INDEX: 5
+          #   resources:
+          #     networks:
+          #       - name: substrate-network
+          # - name: node6
+          #   type: substrate
+          #   environment:
+          #     NODE_INDEX: 6
+          #   resources:
+          #     networks:
+          #       - name: substrate-network
+          # - name: node7
+          #   type: substrate
+          #   environment:
+          #     NODE_INDEX: 7
+          #   resources:
+          #     networks:
+          #       - name: substrate-network
           - type: polkadot-ui
             port-mappings:
               - "80:80"

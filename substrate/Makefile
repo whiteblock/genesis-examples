@@ -1,8 +1,8 @@
 build:
-	docker build -t "gcr.io/whiteblock/paritytech/substrate" . -f substrate.Dockerfile
+	docker build -t "gcr.io/whiteblock/paritytech/substrate:latest" . -f substrate.Dockerfile
 
 push:
-	docker push "gcr.io/whiteblock/paritytech/substrate"
+	docker push "gcr.io/whiteblock/paritytech/substrate:latest"
 
 gen-spec:
 	substrate-node-template/target/release/node-template \

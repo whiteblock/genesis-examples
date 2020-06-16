@@ -55,7 +55,7 @@ in a `build/` folder. Replace the two instances of
 `bootnode_libp2p_addr.txt`. Next, build the substrate Docker container for
 Genesis and push it to a registry.
 
-    docker build . -f substrate.Dockerfile 
+    docker build . -f substrate.Dockerfile # tag & push accordingly
 
 Change the `image:` for the substrate service in `substrate.yaml` to the
 registry you pushed the container to. Under the `tests:` section of the yaml,
@@ -73,11 +73,10 @@ we needed to manually build the image.
 
 After a newly launched test starts after the environment is setup, you can point
 your  browser to the URL under `Domains:`. This will take you to the polkadot-js
-app UI, which is running as a service in the test. In the settings section,
-replace the IP address with the same domain. Example:
+app UI, which is running as a service in the test. Example:
 
-    ws://wingtundra-0.biomes.whiteblock.io:9944
+    http://rabbitink-0.biomes.whiteblock.io
 
 Explore the UI to see the chain status. If you are using the provided
-`chainSpec.json`, there will be test accounts available to send currency between
-using the UI.
+`chainSpec.json` as a template, there will be test accounts available to send
+currency between using the UI.
