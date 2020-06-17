@@ -1,6 +1,6 @@
 services:
   - name: substrate
-    image: gcr.io/whiteblock/paritytech/substrate:latest
+    image: gcr.io/whiteblock/paritytech/substrate:quickstart
     input-files:
       # Please add customSpec.json to the container. Fix coming soon!
       # - source-path: ./customSpec.json
@@ -15,7 +15,7 @@ services:
   - name: polkadot-ui
     image: gcr.io/whiteblock/polkadot-js/apps:latest
     environment:
-      WS_URL: ws://0.0.0.0:9944
+      WS_URL: ws://$_host:9944
 tests:
   - name: simple-substrate-exercise
     description: run a susbrate private testnet
@@ -32,6 +32,7 @@ tests:
             resources:
               networks:
                 - name: substrate-network
+                - name: local-private-net
           - name: node1
             type: substrate
             environment:

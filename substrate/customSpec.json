@@ -15,28 +15,28 @@
       },
       "aura": {
         "authorities": [
-          "5CPtCmaLRb5v8Le13WdgL2BvNXGfyNQuh5BqVU55K6oQUSh1",
-          "5FHZ6cjCx9RNuy375ksgaVAyCuLGG7mfUs9ZocFxerQiqEHJ",
-          "5FZ5xwWEyTDQ7UfFYJ7qLqqNMM8u7e25m3Bne3cYuzzakLT5",
-          "5ERkUmBbKXNcu5CPBacF92y6xEWpPspLSGuCwU3Wp3YYbKj4"
+          "5GcAtBZ4WEkcJabjCPk1hKjqBhWq5CFPcZTD1iUMzCdCic8w",
+          "5EUGAf7PzhQs5aTNiSiTPMNLstT6SNxiDLiM5zCmzCFkadKg",
+          "5D1nQnyBbmzzaa56AhvbqotMrDTw6ErDgYm5tR2ZSfa9m3pM",
+          "5Fpvt1pQXbsBJKxuUmPMoQDV51FerWHXmrfzLebHVDvQLmew"
         ]
       },
       "grandpa": {
         "authorities": [
           [
-            "5EAYTSKr6FLwb7zfuyqjsGetxcFJ5rsURYmBmd8rQ2zv9uNy",
+            "5E2U447sv43Zb5ZxyV539DaiKFnskV3KrqEGDa7JNwwbfaBU",
             1
           ],
           [
-            "5Gvth1HRpZFdYG991cwfLV5YFN9uQH72rXYAKCbpDj9hds4y",
+            "5H5AdWzXkw7fFwQi25nKeV95cL1Sz3MfKsCp6nzZkU5LcRCw",
             1
           ],
           [
-            "5GqJCnQZaJafaAx4MAK8kXdvFARZgdMgzh348fWpUyHCKHQ8",
+            "5C7Es7ub8vkYAKh615gZ1LiqFZxdZVbj59R7rLrci1UZ4LGf",
             1
           ],
           [
-            "5E9ceHEhhjCYwrZxZknrGAcSpqm4DBypQWGzPcpTUhDhqfmD",
+            "5CMooD4VzRSLzciGDqQkP3osUWsDyFQwgvcPGsjibBk5328b",
             1
           ]
         ]
