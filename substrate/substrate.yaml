@@ -1,6 +1,6 @@
 services:
   - name: substrate
-    image: gcr.io/whiteblock/paritytech/substrate:latest
+    image: gcr.io/whiteblock/paritytech/substrate:quickstart
     input-files:
       # Please add customSpec.json to the container. Fix coming soon!
       # - source-path: ./customSpec.json
@@ -32,6 +32,7 @@ tests:
             resources:
               networks:
                 - name: substrate-network
+                - name: local-private-net
           - name: node1
             type: substrate
             environment:
@@ -53,34 +54,6 @@ tests:
             resources:
               networks:
                 - name: substrate-network
-          # - name: node4
-          #   type: substrate
-          #   environment:
-          #     NODE_INDEX: 4
-          #   resources:
-          #     networks:
-          #       - name: substrate-network
-          # - name: node5
-          #   type: substrate
-          #   environment:
-          #     NODE_INDEX: 5
-          #   resources:
-          #     networks:
-          #       - name: substrate-network
-          # - name: node6
-          #   type: substrate
-          #   environment:
-          #     NODE_INDEX: 6
-          #   resources:
-          #     networks:
-          #       - name: substrate-network
-          # - name: node7
-          #   type: substrate
-          #   environment:
-          #     NODE_INDEX: 7
-          #   resources:
-          #     networks:
-          #       - name: substrate-network
           - type: polkadot-ui
             port-mappings:
               - "80:80"
