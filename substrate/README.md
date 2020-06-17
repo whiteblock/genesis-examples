@@ -7,8 +7,8 @@ and a workflow is provided to scale the number of validators.
 
 If you are interested in just running this example out the box, clone this 
 repository and rename the `quickstart` folder to `build`. Then, replace the two
-instances of  `INSERT_BOOTNODE_LIBP2P_ADDR_HERE` in `wrapper.sh` with the key in
-`build/bootnode_libp2p_addr.txt`. Lastly,
+instances of  `INSERT_BOOTNODE_LIBP2P_ADDR_HERE` in `wrapper.sh` with the
+address in `build/bootnode_libp2p_addr.txt`. Lastly,
 
     genesis run substrate.yaml
 
@@ -18,9 +18,9 @@ Jump to the "Explore the UI" section.
 
 Clone this repository recursively to clone the source code for
 [substrate-developer-hub/substrate-node-template](https://github.com/substrate-developer-hub/substrate-node-template).
-Build `node-template` using the Docker workflow. This is important to ensure the
-`glibc` version is  compatible with the substrate node Docker container that you
-will build.
+Build `node-template` using Substrate's Docker workflow. This is important to
+ensure the `glibc` version is  compatible with the substrate node Docker
+container that you will build.
 
     cd substrate-node-template
     ./scripts/docker_run.sh
@@ -28,8 +28,8 @@ will build.
 When the build completes and the container runs, close it. We have provided a
 default chain specification `customSpec.json` in this repository which is based
 on the template generated using the command below. You can use your own by
-replacing it. To use the included scripts, make sure to use the filename
-`customSpec.json`.
+replacing it. To use the included scripts for injecting generated `grandpa` and
+`aura` keys, make sure your custom chain spec is still named `customSpec.json`.
 
     ./substrate-node-template/target/release/node-template build-spec --disable-default-bootnode --chain local > customSpec.json
 
@@ -43,17 +43,13 @@ needed, replace the  existing one in `bin/`. In the command below, replace
 
     python3 gen_keys_chainspec.py <num_keys> <chain_spec_file>
 
-To use the provided Genesis substrate.yaml file, run this command:
-
-    python3 gen_keys_chainspec.py 4 customSpec.json
-
 This will python script will generate validator keys and addresses, add the 
 SS58 addresses into the chain spec file, and generate a libp2p address to be
 specifically used for the bootnode in the network. These files will be generated
 in a `build/` folder. Replace the two instances of 
 `INSERT_BOOTNODE_LIBP2P_ADDR_HERE` in `wrapper.sh` with the key in
 `bootnode_libp2p_addr.txt`. Next, build the substrate Docker container for
-Genesis and push it to a registry.
+Genesis and push it to a public registry.
 
     docker build . -f substrate.Dockerfile # tag & push accordingly
 
