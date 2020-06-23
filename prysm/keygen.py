@@ -7,11 +7,12 @@ from eth_utils import (
 )
 import base64
 import json
-
-CURVE_ORDER = 52435875175126190479447740508185965837690552500527637822603658699938581184513
+import os
 
 # Number of keys to generate
-NUM_KEYS = 64
+NUM_KEYS = 4
+
+CURVE_ORDER = 52435875175126190479447740508185965837690552500527637822603658699938581184513
 
 
 def int_to_hex(n: int, byte_length: int = None) -> str:
@@ -51,5 +52,7 @@ if __name__ == '__main__':
     validator_keys = {
         'keys': keypairs
     }
+
+    os.makedirs(os.path.dirname('./build/validator_keys.json'), exist_ok=True)
     with open('./build/validator_keys.json', 'w') as f:
         json.dump(validator_keys, f, indent=4)

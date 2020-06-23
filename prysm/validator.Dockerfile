@@ -9,4 +9,6 @@ FROM gcr.io/whiteblock/base:ubuntu1804
 
 COPY --from=builder /src/bazel-bin/validator/linux_amd64_stripped/validator /usr/local/bin/
 
+EXPOSE 8081
+
 ENTRYPOINT ["/usr/local/bin/validator"]
