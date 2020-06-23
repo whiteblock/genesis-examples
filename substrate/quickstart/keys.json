@@ -1,0 +1,50 @@
+{
+    "node0": {
+        "aura": {
+            "secret_seed": "0xa8c747faad0dded16345dd5ba95fbc602bf01ca5678213172a953bb08f28395d",
+            "pubkey": "0xc8f084f244ed48adc60c99035c6b5a99b2f0eec505de0d5f5ab9f760ec81d207",
+            "ss58_addr": "5GcAtBZ4WEkcJabjCPk1hKjqBhWq5CFPcZTD1iUMzCdCic8w"
+        },
+        "grandpa": {
+            "secret_seed": "0xa8c747faad0dded16345dd5ba95fbc602bf01ca5678213172a953bb08f28395d",
+            "pubkey": "0x56c3823bdeec2a653d6f49166eb0641ade072f4b0df643d45e364ffea3f8887a",
+            "ss58_addr": "5E2U447sv43Zb5ZxyV539DaiKFnskV3KrqEGDa7JNwwbfaBU"
+        }
+    },
+    "node1": {
+        "aura": {
+            "secret_seed": "0x779c9d45d26ee070c7aca56630719c40feca323e52896b83dcbefaa23ddf86cf",
+            "pubkey": "0x6a6fe07c008a8980643cf75c0b7a182627fb6e75abdd1dedc0d9194570c34950",
+            "ss58_addr": "5EUGAf7PzhQs5aTNiSiTPMNLstT6SNxiDLiM5zCmzCFkadKg"
+        },
+        "grandpa": {
+            "secret_seed": "0x779c9d45d26ee070c7aca56630719c40feca323e52896b83dcbefaa23ddf86cf",
+            "pubkey": "0xdd874b49f243ded479e7255853460c02c3b413918df013cd69a74af95c4294c6",
+            "ss58_addr": "5H5AdWzXkw7fFwQi25nKeV95cL1Sz3MfKsCp6nzZkU5LcRCw"
+        }
+    },
+    "node2": {
+        "aura": {
+            "secret_seed": "0x53618a1882e60671a3d8f96d13100ecd63f6b4ea14dab81c818430e6b4fdb18a",
+            "pubkey": "0x2a01d3b28249cbe5ecdb00b8e5f4ffc0e6b06928260537e09e726a9414eefd72",
+            "ss58_addr": "5D1nQnyBbmzzaa56AhvbqotMrDTw6ErDgYm5tR2ZSfa9m3pM"
+        },
+        "grandpa": {
+            "secret_seed": "0x53618a1882e60671a3d8f96d13100ecd63f6b4ea14dab81c818430e6b4fdb18a",
+            "pubkey": "0x01eedf4ec08d4e197ea12aab65bffc44e0d672771c3b5b5fb27e06b0716f64dc",
+            "ss58_addr": "5C7Es7ub8vkYAKh615gZ1LiqFZxdZVbj59R7rLrci1UZ4LGf"
+        }
+    },
+    "node3": {
+        "aura": {
+            "secret_seed": "0x6c29d5da78865a70f7526f3435120b77b7354a85c5fe18f6c9b6cb27980e9978",
+            "pubkey": "0xa66f56931ddc6938a8df75b084ac19be1baaf5143d7098b8d792215b5f085948",
+            "ss58_addr": "5Fpvt1pQXbsBJKxuUmPMoQDV51FerWHXmrfzLebHVDvQLmew"
+        },
+        "grandpa": {
+            "secret_seed": "0x6c29d5da78865a70f7526f3435120b77b7354a85c5fe18f6c9b6cb27980e9978",
+            "pubkey": "0x0d0b2b3a3eb9f90ffafb1cd6d446cb0e8189a9aefb87a42be304b1b68f7c13a9",
+            "ss58_addr": "5CMooD4VzRSLzciGDqQkP3osUWsDyFQwgvcPGsjibBk5328b"
+        }
+    }
+}

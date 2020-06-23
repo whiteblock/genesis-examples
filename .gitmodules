@@ -4,3 +4,6 @@
 [submodule "prysm/eth2-beaconchain-explorer"]
 	path = prysm/eth2-beaconchain-explorer
 	url = https://github.com/gobitfly/eth2-beaconchain-explorer.git
+[submodule "substrate/substrate-node-template"]
+	path = substrate/substrate-node-template
+	url = https://github.com/substrate-developer-hub/substrate-node-template.git

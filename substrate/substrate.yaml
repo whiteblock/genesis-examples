@@ -1,0 +1,62 @@
+services:
+  - name: substrate
+    image: gcr.io/whiteblock/paritytech/substrate:quickstart
+    input-files:
+      # Please add customSpec.json to the container. Fix coming soon!
+      # - source-path: ./customSpec.json
+      #   destination-path: /var/local/customSpecRaw.json
+      - source-path: ./build/keys.json
+        destination-path: /var/local/keys.json
+      - source-path: ./build/bootnode_libp2p_addr
+        destination-path: /var/local/bootnode_libp2p_addr
+      # Adding wrapper.sh here will overwrite the one built into the container
+      - source-path: ./wrapper.sh
+        destination-path: /var/local/wrapper.sh
+  - name: polkadot-ui
+    image: gcr.io/whiteblock/polkadot-js/apps:latest
+    environment:
+      WS_URL: ws://$_host:9944
+tests:
+  - name: simple-substrate-exercise
+    description: run a susbrate private testnet
+    phases:
+      - name: start-substrate-testnet
+        duration: 1000 s
+        system:
+          - name: node0
+            type: substrate
+            environment:
+              NODE_INDEX: 0
+            port-mappings:
+              - "9944:9944"
+            resources:
+              networks:
+                - name: substrate-network
+                - name: local-private-net
+          - name: node1
+            type: substrate
+            environment:
+              NODE_INDEX: 1
+            resources:
+              networks:
+                - name: substrate-network
+          - name: node2
+            type: substrate
+            environment:
+              NODE_INDEX: 2
+            resources:
+              networks:
+                - name: substrate-network
+          - name: node3
+            type: substrate
+            environment:
+              NODE_INDEX: 3
+            resources:
+              networks:
+                - name: substrate-network
+          - type: polkadot-ui
+            port-mappings:
+              - "80:80"
+            resources:
+              networks:
+                - name: substrate-network
