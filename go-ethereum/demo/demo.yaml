@@ -1,0 +1,99 @@
+services: 
+  - name: geth
+    image: "ethereum/client-go:alltools-latest"
+    volumes:
+      - path: /accounts/
+        name: accounts
+        scope: singleton
+    script:
+      inline: >
+        mkdir -p /geth/keystore;
+        cp /accounts/keystore/* /geth/keystore;
+        geth --nousb --datadir ./geth/ init /accounts/genesis.json;
+        geth --datadir ./geth/ --http --http.addr 0.0.0.0 --miner.gasprice=${MINER_GASPRICE} --http.api "admin,web3,eth,net,personal,miner,txpool" --http.corsdomain "0.0.0.0" --txpool.nolocals --http.vhosts=* --verbosity=5 --port 30303 --nousb --etherbase $(cat /accounts/address${INDEX}) --unlock $(cat /accounts/address${INDEX}) --allow-insecure-unlock --password /geth/pw.txt --mine --miner.threads=6 --ethstats $NAME:${ETH_STATS_SECRET}@ethstats-service0:3000 --bootnodes enode://$(cat /accounts/nodekey0)@${GETH_SERVICE0_COMMON_NETWORK}:30303?discport=30303
+    environment:
+      ETH_STATS_SECRET: secret
+      MINER_GASPRICE: "1"
+    input-files: 
+      - source-path: ./genesis.json
+        destination-path: /geth/genesis.json
+      - source-path: password.txt
+        destination-path: /geth/pw.txt
+    resources:
+      cpus: 4
+      memory: 4 GB
+      storage: 30 GiB
+  - name: ethstats
+    image: gcr.io/whiteblock/ethstats:master
+    environment:
+      HOST: "0.0.0.0"
+    input-files:
+      - source-path: ws_secret.json
+        destination-path: /eth-netstats/ws_secret.json
+task-runners:
+  - name: generate-accounts
+    image: "gcr.io/whiteblock/helpers/ethereum/accounts:master"
+    environment:
+      ACCOUNTS: 3
+    script:
+      inline: account generate -c $ACCOUNTS -e -d /accounts
+    volumes:
+      - path: /accounts/
+        name: accounts
+        scope: singleton
+    resources:
+      cpus: 1
+      memory: 2 GB
+
+  - name: generate-genesis
+    image: gcr.io/whiteblock/helpers/ethereum/genesis:master
+    volumes:
+      - path: /accounts/
+        name: accounts
+        scope: singleton
+    script:
+      inline: genesis generate -a /accounts/accounts.json | tee /accounts/genesis.json
+    resources:
+      cpus: 1
+      memory: 2 GB
+
+  - name: generate-keystore
+    image: gcr.io/whiteblock/helpers/geth/keystore:master
+    volumes:
+      - path: /accounts/
+        name: accounts
+        scope: singleton
+    input-files: 
+      - source-path: password.txt
+        destination-path: /geth/pw.txt
+    scripts:
+      inline: keystore -p /geth/pw.txt -f /accounts/accounts.json -o /accounts/keystore/
+    resources:
+      cpus: 1
+      memory: 2 GB
+
+tests: 
+  - name: geth_demo
+    phases:
+      - name: accounts
+        tasks: 
+        - type: generate-accounts
+        system:
+          - type: ethstats
+            resources:
+              networks:
+                - name: common-network
+            port-mappings:
+            - "80:3000"
+      - name: keystore-genesis
+        tasks:
+          - type: generate-genesis
+          - type: generate-keystore
+      - name: start
+        duration: 2h
+        system:
+          - type: geth
+            count: 3
+            resources:
+              networks:
+                - name: common-network
