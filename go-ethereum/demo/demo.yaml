@@ -10,7 +10,7 @@ services:
         mkdir -p /geth/keystore;
         cp /accounts/keystore/* /geth/keystore;
         geth --nousb --datadir ./geth/ init /accounts/genesis.json;
-        geth --datadir ./geth/ --http --http.addr 0.0.0.0 --miner.gasprice=${MINER_GASPRICE} --http.api "admin,web3,eth,net,personal,miner,txpool" --http.corsdomain "0.0.0.0" --txpool.nolocals --http.vhosts=* --verbosity=5 --port 30303 --nousb --etherbase $(cat /accounts/address${INDEX}) --unlock $(cat /accounts/address${INDEX}) --allow-insecure-unlock --password /geth/pw.txt --mine --miner.threads=${MINER_THREADS} --nodekeyhex $(cat /accounts/priv$INDEX) --ethstats $NAME:${ETH_STATS_SECRET}@${ETHSTATS_SERVICE0_COMMON_NETWORK}:3000 --bootnodes enode://$(cat /accounts/nodekey0)@${GETH_SERVICE0_COMMON_NETWORK}:30303?discport=30303
+        geth --networkid 7777 --datadir ./geth/ --http --http.addr 0.0.0.0 --miner.gasprice=${MINER_GASPRICE} --http.api "admin,web3,eth,net,personal,miner,txpool" --http.corsdomain "0.0.0.0" --txpool.nolocals --http.vhosts=* --verbosity=5 --port 30303 --nousb --miner.etherbase $(cat /accounts/address${INDEX}) --unlock $(cat /accounts/address${INDEX}) --allow-insecure-unlock --password /geth/pw.txt --mine --miner.threads=${MINER_THREADS} --nodekeyhex $(cat /accounts/priv$INDEX) --ethstats $NAME:${ETH_STATS_SECRET}@${ETHSTATS_SERVICE0_COMMON_NETWORK}:3000 --bootnodes enode://$(cat /accounts/nodekey0)@${GETH_SERVICE0_COMMON_NETWORK}:30303?discport=30303
     environment:
       ETH_STATS_SECRET: testnet_secret
       MINER_GASPRICE: "1"
@@ -24,6 +24,7 @@ services:
       cpus: 3
       memory: 6 GB
       storage: 30 GiB
+  
   - name: ethstats
     image: gcr.io/whiteblock/ethstats:master
     environment:
@@ -31,11 +32,41 @@ services:
     input-files:
       - source-path: ws_secret.json
         destination-path: /eth-netstats/ws_secret.json
+  - name: record
+    image: gcr.io/whiteblock/ethereum/record:latest
+    script:
+      inline:
+        app --target http://$GETH_SERVICE0_COMMON_NETWORK:8545
+    resources:
+      cpus: 1
+      memory: 1 GiB
+      storage: 10 GiB
+
+sidecars:
+  - name: background-transactions
+    sidecar-to:
+      - geth
+    volumes:
+      - path: /accounts/
+        name: accounts
+        scope: singleton
+    image: gcr.io/whiteblock/helpers/ethereum/tx:master
+    script:
+      inline: tx --chain-id ${CHAIN_ID} --tps ${TPS} --target $SERVICE:8545 --private-key-file /accounts/accounts.json --gas-limit ${GAS_LIMIT}
+    environment:
+      CHAIN_ID: "7777"
+      TPS: "1"
+      GAS_LIMIT: "4000000"
+    resources:
+      cpus: 2
+      memory: 3 GB
+      storage: 30 GiB
+
 task-runners:
   - name: generate-accounts
     image: "gcr.io/whiteblock/helpers/ethereum/accounts:master"
     environment:
-      ACCOUNTS: 3
+      ACCOUNTS: 7
     script:
       inline: accounts generate -c $ACCOUNTS -e -d /accounts
     volumes:
@@ -57,7 +88,14 @@ task-runners:
     resources:
       cpus: 1
       memory: 2 GB
-
+  - name: generate-static-peers
+    image: gcr.io/whiteblock/helpers/ethereum/static-peers:master
+    volumes:
+      - path: /accounts/
+        name: accounts
+        scope: singleton
+    script: 
+      inline: 
   - name: generate-keystore
     image: gcr.io/whiteblock/helpers/geth/keystore:master
     volumes:
@@ -91,10 +129,17 @@ tests:
           - type: generate-genesis
           - type: generate-keystore
       - name: start
-        duration: 2h
         system:
           - type: geth
-            count: 3
+            count: 7
             resources:
               networks:
                 - name: common-network
+      - name: stats
+        system:
+        - type: record
+          port-mappings:
+            - "8080:8080"
+          resources:
+            networks:
+              - name: common-network
