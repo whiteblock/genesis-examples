@@ -9,8 +9,12 @@ services:
       inline: >
         mkdir -p /geth/keystore;
         cp /accounts/keystore/* /geth/keystore;
-        geth --nousb --datadir ./geth/ init /accounts/genesis.json;
-        geth --networkid 7777 --datadir ./geth/ --http --http.addr 0.0.0.0 --miner.gasprice=${MINER_GASPRICE} --http.api "admin,web3,eth,net,personal,miner,txpool" --http.corsdomain "0.0.0.0" --txpool.nolocals --http.vhosts=* --verbosity=5 --port 30303 --nousb --miner.etherbase $(cat /accounts/address${INDEX}) --unlock $(cat /accounts/address${INDEX}) --allow-insecure-unlock --password /geth/pw.txt --mine --miner.threads=${MINER_THREADS} --nodekeyhex $(cat /accounts/priv$INDEX) --ethstats $NAME:${ETH_STATS_SECRET}@${ETHSTATS_SERVICE0_COMMON_NETWORK}:3000 --bootnodes enode://$(cat /accounts/nodekey0)@${GETH_SERVICE0_COMMON_NETWORK}:30303?discport=30303
+        cp /accounts/static-nodes.json /geth/;
+        geth --nousb --datadir /geth/ init /accounts/genesis.json;
+        geth --networkid 7777 --datadir /geth/ --http --http.addr 0.0.0.0 --miner.gasprice=${MINER_GASPRICE} --http.api "admin,web3,eth,net,personal,miner,txpool" --http.corsdomain "0.0.0.0" --txpool.nolocals --http.vhosts=* --verbosity=5 --port 30303 --nousb --miner.etherbase $(cat /accounts/address${INDEX}) --unlock $(cat /accounts/address${INDEX}) --allow-insecure-unlock --password /geth/pw.txt --mine --miner.threads=${MINER_THREADS} --nodekeyhex $(cat /accounts/priv$INDEX) --ethstats $NAME:${ETH_STATS_SECRET}@${ETHSTATS_SERVICE0_COMMON_NETWORK}:3000 --nodiscover
+
+
+  #--bootnodes enode://$(cat /accounts/nodekey0)@${GETH_SERVICE0_COMMON_NETWORK}:30303?discport=30303
     environment:
       ETH_STATS_SECRET: testnet_secret
       MINER_GASPRICE: "1"
@@ -66,7 +70,7 @@ task-runners:
   - name: generate-accounts
     image: "gcr.io/whiteblock/helpers/ethereum/accounts:master"
     environment:
-      ACCOUNTS: 7
+      ACCOUNTS: 2
     script:
       inline: accounts generate -c $ACCOUNTS -e -d /accounts
     volumes:
@@ -95,7 +99,7 @@ task-runners:
         name: accounts
         scope: singleton
     script: 
-      inline: 
+      inline: generate --accounts-file /accounts/accounts.json --network common-network --service geth | tee /accounts/static-nodes.json
   - name: generate-keystore
     image: gcr.io/whiteblock/helpers/geth/keystore:master
     volumes:
@@ -128,10 +132,11 @@ tests:
         tasks:
           - type: generate-genesis
           - type: generate-keystore
+          - type: generate-static-peers
       - name: start
         system:
           - type: geth
-            count: 7
+            count: 2
             resources:
               networks:
                 - name: common-network
