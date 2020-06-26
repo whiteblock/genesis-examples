@@ -23,7 +23,7 @@ services:
       - source-path: password.txt
         destination-path: /geth/pw.txt
     resources:
-      cpus: 3
+      cpus: 6
       memory: 6 GB
       storage: 30 GiB
   
@@ -163,16 +163,19 @@ tests:
       - name: start
         system:
           - type: geth
-            count: 2
+            count: 1
+            port-mappings:
+              - "8545:8545"
             resources:
               networks:
                 - name: common-network
       - name: await-block-production
-        tasks:
-          - type: await-block-production
-            timeout: 5m
-            networks:
-              - name: common-network
+        duration: 5m
+      #   tasks:
+      #     - type: await-block-production
+      #       timeout: 5m
+      #       networks:
+      #         - name: common-network
       - name: stats
         system:
         - type: record
@@ -184,13 +187,17 @@ tests:
       - name: start-tps-logger
         system:
         - type: tps-logger
+          port-mappings:
+            - "7777:7777"
           resources:
             networks:
               - name: common-network
       - name: wait-for-blocks-100
-        tasks:
-          - type: await-blocks-100
-            timeout: 60m
+        duration: 5m
+
+      #   tasks:
+      #     - type: await-blocks-100
+      #       timeout: 60m
       - name: network-impairments
         system:
         - type: geth
@@ -198,8 +205,9 @@ tests:
           resources:
             networks:
               - name: common-network
-                latency: 100ms
+                latency: 300ms
       - name: wait-for-blocks-200
-        tasks:
-          - type: await-blocks-100
-            timeout: 60m
+        duration: 5m
+      #   tasks:
+      #     - type: await-blocks-100
+      #       timeout: 60m
