@@ -48,7 +48,7 @@ services:
   - name: tps-logger
     image: gcr.io/whiteblock/helpers/ethereum/tps-logger:master
     script:
-      inline: tps-logger --node $GETH_SERVICE0_COMMON_NETWORK:8545 --record $RECORD_SERVICE0_COMMON_NETWORK:8080
+      inline: tps-logger --node $GETH_SERVICE0_COMMON_NETWORK:8545 --record $RECORD_SERVICE0_COMMON_NETWORK:8080 --listen 0.0.0.0:7777
     resources:
       memory: 1 GiB
 
@@ -184,7 +184,7 @@ tests:
               - name: common-network
       - name: start-tps-logger
         system:
-        - type: tps-logger
+        - type: tps-logger 
           port-mappings:
             - "7777:7777"
           resources:
@@ -209,3 +209,5 @@ tests:
       #   tasks:
       #     - type: await-blocks-100
       #       timeout: 60m
+#
+# Show account
