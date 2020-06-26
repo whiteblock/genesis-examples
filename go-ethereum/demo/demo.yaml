@@ -163,9 +163,7 @@ tests:
       - name: start
         system:
           - type: geth
-            count: 1
-            port-mappings:
-              - "8545:8545"
+            count: 7
             resources:
               networks:
                 - name: common-network
