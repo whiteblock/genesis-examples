@@ -164,8 +164,6 @@ tests:
         system:
           - type: geth
             count: 2
-            port-mappings:
-            - "8545:8545"
             resources:
               networks:
                 - name: common-network
