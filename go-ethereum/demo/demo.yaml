@@ -165,7 +165,7 @@ tests:
       - name: start
         system:
           - type: geth
-            count: 1
+            count: 7
             resources:
               networks:
                 - name: common-network
@@ -205,7 +205,7 @@ tests:
       - name: network-impairments
         system:
         - type: geth
-          count: 1
+          count: 7
           resources:
             networks:
               - name: common-network
