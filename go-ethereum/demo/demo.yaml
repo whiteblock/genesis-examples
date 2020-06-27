@@ -76,7 +76,7 @@ task-runners:
   - name: generate-accounts
     image: "gcr.io/whiteblock/helpers/ethereum/accounts:master"
     environment:
-      ACCOUNTS: 20
+      ACCOUNTS: "20"
     script:
       inline: accounts generate -c $ACCOUNTS -e -d /accounts
     volumes:
@@ -155,25 +155,28 @@ tests:
                 - name: common-network
             port-mappings:
             - "3000:3000"
+      
       - name: keystore-genesis
         tasks:
           - type: generate-genesis
           - type: generate-keystore
           - type: generate-static-peers
+      
       - name: start
         system:
           - type: geth
-            count: 7
+            count: 1
             resources:
               networks:
                 - name: common-network
+      
       - name: await-block-production
-        duration: 5m
-      #   tasks:
-      #     - type: await-block-production
-      #       timeout: 5m
-      #       networks:
-      #         - name: common-network
+        tasks:
+          - type: await-block-production
+            timeout: 10m
+            networks:
+              - name: common-network
+
       - name: stats
         system:
         - type: record
@@ -182,6 +185,7 @@ tests:
           resources:
             networks:
               - name: common-network
+
       - name: start-tps-logger
         system:
         - type: tps-logger 
@@ -190,24 +194,27 @@ tests:
           resources:
             networks:
               - name: common-network
-      - name: wait-for-blocks-100
-        duration: 5m
 
-      #   tasks:
-      #     - type: await-blocks-100
-      #       timeout: 60m
+      - name: wait-for-blocks-100
+        tasks:
+          - type: await-blocks-100
+            timeout: 60m
+            networks:
+              - name: common-network
+
       - name: network-impairments
         system:
         - type: geth
-          count: 7
+          count: 1
           resources:
             networks:
               - name: common-network
                 latency: 300ms
       - name: wait-for-blocks-200
-        duration: 5m
-      #   tasks:
-      #     - type: await-blocks-100
-      #       timeout: 60m
+        tasks:
+          - type: await-blocks-200
+            timeout: 60m
+            networks:
+              - name: common-network
 #
 # Show account
