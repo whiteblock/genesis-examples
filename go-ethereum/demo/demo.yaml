@@ -1,4 +1,5 @@
 substitutions:
+  _ACCOUNT_PASSWORD: "password"
   _ETH_NETWORK_ID: "7777"
   _SPLUNK_HEC_URL: "https://35.224.188.142:8088"
   _SPLUNK_HEC_TOKEN: "d1b8059a-3b66-4fa4-9a72-4d75b009caaa"
@@ -15,6 +16,7 @@ services:
         mkdir -p /geth/keystore;
         cp /accounts/keystore/* /geth/keystore;
         cp /accounts/static-nodes.json /geth/;
+        echo $_ACCOUNT_PASSWORD > /geth/pw.txt;
         geth --nousb --datadir /geth/ init /accounts/genesis.json;
         geth --networkid ${CHAIN_ID} --datadir /geth/ --http --http.addr 0.0.0.0 --miner.gasprice=${MINER_GASPRICE} --http.api "admin,web3,eth,net,personal,miner,txpool" --http.corsdomain "0.0.0.0" --txpool.nolocals --http.vhosts=* --verbosity=5 --port 30303 --nousb --miner.etherbase $(cat /accounts/address${INDEX}) --unlock $(cat /accounts/address${INDEX}) --allow-insecure-unlock --password /geth/pw.txt --mine --miner.threads=${MINER_THREADS} --nodekeyhex $(cat /accounts/priv$INDEX) --ethstats $NAME:${ETH_STATS_SECRET}@${ETHSTATS_SERVICE0_COMMON_NETWORK}:3000 --nodiscover
   #--bootnodes enode://$(cat /accounts/nodekey0)@${GETH_SERVICE0_COMMON_NETWORK}:30303?discport=30303
@@ -23,11 +25,6 @@ services:
       MINER_GASPRICE: "1"
       MINER_THREADS: "1"
       CHAIN_ID: "$_ETH_NETWORK_ID"
-    input-files: 
-      - source-path: ./genesis.json
-        destination-path: /geth/genesis.json
-      - source-path: password.txt
-        destination-path: /geth/pw.txt
     resources:
       cpus: 4
       memory: 6 GB
@@ -40,6 +37,8 @@ services:
     input-files:
       - source-path: ws_secret.json
         destination-path: /eth-netstats/ws_secret.json
+    resources:
+      memory: 1 GB
   
   - name: record
     image: gcr.io/whiteblock/helpers/ethereum/record:master
@@ -146,11 +145,10 @@ task-runners:
       - path: /accounts/
         name: accounts
         scope: singleton
-    input-files: 
-      - source-path: password.txt
-        destination-path: /geth/pw.txt
     script:
-      inline: keystore -p /geth/pw.txt -f /accounts/accounts.json -o /accounts/keystore/
+      inline: >
+        echo $_ACCOUNT_PASSWORD > /tmp/pw.txt;
+        keystore -p /tmp/pw.txt -f /accounts/accounts.json -o /accounts/keystore/
     resources:
       cpus: 1
       memory: 2 GB
