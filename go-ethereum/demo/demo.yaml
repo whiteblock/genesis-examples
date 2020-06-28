@@ -1,8 +1,9 @@
 substitutions:
   _ACCOUNT_PASSWORD: "password"
   _ETH_NETWORK_ID: "7777"
-  _SPLUNK_HEC_URL: "https://35.224.188.142:8088"
+  _SPLUNK_HEC_URL: "https://104.155.159.170:8088"
   _SPLUNK_HEC_TOKEN: "d1b8059a-3b66-4fa4-9a72-4d75b009caaa"
+  _ACCOUNTS_TO_CREATE: "20"
 
 services: 
   - name: geth
@@ -18,17 +19,16 @@ services:
         cp /accounts/static-nodes.json /geth/;
         echo $_ACCOUNT_PASSWORD > /geth/pw.txt;
         geth --nousb --datadir /geth/ init /accounts/genesis.json;
-        geth --networkid ${CHAIN_ID} --datadir /geth/ --http --http.addr 0.0.0.0 --miner.gasprice=${MINER_GASPRICE} --http.api "admin,web3,eth,net,personal,miner,txpool" --http.corsdomain "0.0.0.0" --txpool.nolocals --http.vhosts=* --verbosity=5 --port 30303 --nousb --miner.etherbase $(cat /accounts/address${INDEX}) --unlock $(cat /accounts/address${INDEX}) --allow-insecure-unlock --password /geth/pw.txt --mine --miner.threads=${MINER_THREADS} --nodekeyhex $(cat /accounts/priv$INDEX) --ethstats $NAME:${ETH_STATS_SECRET}@${ETHSTATS_SERVICE0_COMMON_NETWORK}:3000 --nodiscover
+        geth --networkid $_ETH_NETWORK_ID --datadir /geth/ --http --http.addr 0.0.0.0 --miner.gasprice=${MINER_GASPRICE} --http.api "admin,web3,eth,net,personal,miner,txpool" --http.corsdomain "0.0.0.0" --txpool.nolocals --http.vhosts=* --verbosity=5 --port 30303 --nousb --miner.etherbase $(cat /accounts/address${INDEX}) --unlock $(cat /accounts/address${INDEX}) --allow-insecure-unlock --password /geth/pw.txt --mine --miner.threads=${MINER_THREADS} --nodekeyhex $(cat /accounts/priv$INDEX) --ethstats $NAME:${ETH_STATS_SECRET}@${ETHSTATS_SERVICE0_COMMON_NETWORK}:3000 --nodiscover
   #--bootnodes enode://$(cat /accounts/nodekey0)@${GETH_SERVICE0_COMMON_NETWORK}:30303?discport=30303
     environment:
       ETH_STATS_SECRET: testnet_secret
       MINER_GASPRICE: "1"
       MINER_THREADS: "1"
-      CHAIN_ID: "$_ETH_NETWORK_ID"
     resources:
       cpus: 4
       memory: 6 GB
-      storage: 30 GiB
+      storage: 40 GiB
   
   - name: ethstats
     image: gcr.io/whiteblock/ethstats:master
@@ -46,9 +46,7 @@ services:
       inline:
         app --target http://$GETH_SERVICE0_COMMON_NETWORK:8545
     resources:
-      cpus: 1
       memory: 1 GiB
-      storage: 10 GiB
 
   - name: tps-logger
     image: gcr.io/whiteblock/helpers/ethereum/tps-logger:master
@@ -74,50 +72,42 @@ sidecars:
         scope: singleton
     image: gcr.io/whiteblock/helpers/ethereum/tx:master
     script:
-      inline: tx --chain-id ${CHAIN_ID} --tps ${TPS} --target $SERVICE:8545 --private-key-file /accounts/accounts.json --gas-limit ${GAS_LIMIT}
+      inline: tx --chain-id $_ETH_NETWORK_ID --tps ${TPS} --target $SERVICE:8545 --private-key-file /accounts/accounts.json --gas-limit ${GAS_LIMIT}
     environment:
-      CHAIN_ID: "$_ETH_NETWORK_ID"
       TPS: "80"
       GAS_LIMIT: "4000000"
     resources:
       cpus: 2
       memory: 3 GB
-      storage: 30 GiB
 
- - name: ethlogger
-   sidecar-to:
+  - name: ethlogger
+    sidecar-to:
      - geth
-   image: gcr.io/whiteblock/ethlogger:latest
-   resources:
-     cpus: 2
-     memory: 4 GB
-     storage: 30 GiB
-   script:
-     inline:
-       ethlogger --eth-rpc-url=http://$SERVICE:8545
-   environment:
-     NETWORK_NAME: whiteblock
-     START_AT_BLOCK: latest
-     SPLUNK_HEC_URL: "$_SPLUNK_HEC_URL"
-     SPLUNK_HEC_TOKEN: "$_SPLUNK_HEC_TOKEN"
-     SPLUNK_EVENTS_INDEX: main
-     SPLUNK_METRICS_INDEX: metrics
-     SPLUNK_INTERNAL_INDEX: metrics
-     SPLUNK_HEC_REJECT_INVALID_CERTS: "false"
+    image: gcr.io/whiteblock/splunk:latest
+    resources:
+      memory: 4 GB
+    script:
+      inline: ethlogger --eth-rpc-url=http://$SERVICE:8545
+    environment:
+      NETWORK_NAME: whiteblock
+      START_AT_BLOCK: latest
+      SPLUNK_HEC_URL: "$_SPLUNK_HEC_URL"
+      SPLUNK_HEC_TOKEN: "$_SPLUNK_HEC_TOKEN"
+      SPLUNK_EVENTS_INDEX: main
+      SPLUNK_METRICS_INDEX: metrics
+      SPLUNK_INTERNAL_INDEX: metrics
+      SPLUNK_HEC_REJECT_INVALID_CERTS: "false"
 
 task-runners:
   - name: generate-accounts
     image: "gcr.io/whiteblock/helpers/ethereum/accounts:master"
-    environment:
-      ACCOUNTS: "20"
     script:
-      inline: accounts generate -c $ACCOUNTS -e -d /accounts
+      inline: accounts generate -c $_ACCOUNTS_TO_CREATE -e -d /accounts
     volumes:
       - path: /accounts/
         name: accounts
         scope: singleton
     resources:
-      cpus: 1
       memory: 2 GB
 
   - name: generate-genesis
@@ -129,7 +119,6 @@ task-runners:
     script:
       inline: genesis generate -a /accounts/accounts.json -o consensus=ethhash | tee /accounts/genesis.json
     resources:
-      cpus: 1
       memory: 2 GB
   - name: generate-static-peers
     image: gcr.io/whiteblock/helpers/ethereum/static-peers:master
@@ -150,7 +139,6 @@ task-runners:
         echo $_ACCOUNT_PASSWORD > /tmp/pw.txt;
         keystore -p /tmp/pw.txt -f /accounts/accounts.json -o /accounts/keystore/
     resources:
-      cpus: 1
       memory: 2 GB
 
   - name: await-block-production
