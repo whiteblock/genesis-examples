@@ -61,7 +61,7 @@ services:
   - name: eth-viewer
     image: gcr.io/whiteblock/helpers/ethereum/viewer:latest
     script:
-      inline: viewer --node $GETH_SERVICE0_COMMON_NETWORK:8545 --record $RECORD_SERVICE0_COMMON_NETWORK:8080 --listen 0.0.0.0:16555
+      inline: viewer --node $GETH_SERVICE0_COMMON_NETWORK:8545 --listen 0.0.0.0:16555
     resources:
       memory: 1 GiB
 
@@ -179,7 +179,7 @@ task-runners:
 tests: 
   - name: geth_demo
     phases:
-      - name: accounts
+      - name: generating-accounts
         tasks: 
         - type: generate-accounts
         system:
@@ -190,13 +190,13 @@ tests:
             port-mappings:
             - "3000:3000"
       
-      - name: keystore-genesis
+      - name: creating-keystore-genesis-static-peers
         tasks:
           - type: generate-genesis
           - type: generate-keystore
           - type: generate-static-peers
       
-      - name: start
+      - name: starting-geth-nodes
         system:
           - type: geth
             count: 7
@@ -204,14 +204,14 @@ tests:
               networks:
                 - name: common-network
       
-      - name: await-block-production
+      - name: awaiting-block-production
         tasks:
           - type: await-block-production
             timeout: 10m
             networks:
               - name: common-network
 
-      - name: stats
+      - name: starting-stats-tools
         system:
         - type: record
           port-mappings:
@@ -235,14 +235,14 @@ tests:
             networks:
               - name: common-network
 
-      - name: wait-for-blocks-100
+      - name: waiting-for-block-100
         tasks:
           - type: await-blocks-100
             timeout: 60m
             networks:
               - name: common-network
 
-      - name: network-impairments
+      - name: setting-up-network-impairments
         system:
         - type: geth
           count: 7
@@ -251,7 +251,7 @@ tests:
               - name: common-network
                 latency: 300ms
 
-      - name: wait-for-blocks-200
+      - name: waiting-for-block-200
         tasks:
           - type: await-blocks-200
             timeout: 60m
