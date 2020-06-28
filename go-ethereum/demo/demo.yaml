@@ -84,26 +84,26 @@ sidecars:
       memory: 3 GB
       storage: 30 GiB
 
- # - name: ethlogger
- #   sidecar-to:
- #     - geth
- #   image: gcr.io/whiteblock/ethlogger:latest
- #   resources:
- #     cpus: 2
- #     memory: 4 GB
- #     storage: 30 GiB
- #   script:
- #     inline:
- #       ethlogger --eth-rpc-url=http://$SERVICE:8545
- #   environment:
- #     NETWORK_NAME: whiteblock
- #     START_AT_BLOCK: latest
- #     SPLUNK_HEC_URL: "$_SPLUNK_HEC_URL"
- #     SPLUNK_HEC_TOKEN: "$_SPLUNK_HEC_TOKEN"
- #     SPLUNK_EVENTS_INDEX: main
- #     SPLUNK_METRICS_INDEX: metrics
- #     SPLUNK_INTERNAL_INDEX: metrics
- #     SPLUNK_HEC_REJECT_INVALID_CERTS: "false"
+ - name: ethlogger
+   sidecar-to:
+     - geth
+   image: gcr.io/whiteblock/ethlogger:latest
+   resources:
+     cpus: 2
+     memory: 4 GB
+     storage: 30 GiB
+   script:
+     inline:
+       ethlogger --eth-rpc-url=http://$SERVICE:8545
+   environment:
+     NETWORK_NAME: whiteblock
+     START_AT_BLOCK: latest
+     SPLUNK_HEC_URL: "$_SPLUNK_HEC_URL"
+     SPLUNK_HEC_TOKEN: "$_SPLUNK_HEC_TOKEN"
+     SPLUNK_EVENTS_INDEX: main
+     SPLUNK_METRICS_INDEX: metrics
+     SPLUNK_INTERNAL_INDEX: metrics
+     SPLUNK_HEC_REJECT_INVALID_CERTS: "false"
 
 task-runners:
   - name: generate-accounts
