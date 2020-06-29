@@ -1,0 +1,41 @@
+services:
+  - name: geth # the name of the service you'd like to test
+    image: "ethereum/client-go:alltools-latest"
+    volumes:
+      - path: /staticpeers/
+        name: staticpeers
+        scope: singleton
+    script: # if a script is specified here, it will overrun the image's startup command
+      inline: geth --syncmode=full --datadir /mnt/geth/ --rpc --rpcaddr 0.0.0.0 --rpcapi "admin,web3,db,eth,net,personal,miner,txpool" --rpccorsdomain "0.0.0.0" --rpcvhosts=* --port 30303 --nousb --ethstats $NAME:testnet_secret@ethstats-service0:3000
+    resources: # specify the resources you'd like to allot to your service
+      cpus: 4
+      memory: 4 GB
+      storage: 100 GiB
+      prefab: geth-mainnet
+  - name: ethstats
+    image: gcr.io/whiteblock/ethstats:master
+    environment:
+      HOST: "0.0.0.0"
+    input-files:
+      - source-path: ws_secret.json
+        destination-path: /eth-netstats/ws_secret.json
+tests: # here, specify the tests you'd like to run (a minimum of 1 test is required)
+  - name: geth_network_2_nodes # the name of the test
+    description: first test - run two geth nodes on the common-network
+    phases:
+      - name: start
+        duration: infinite
+        system: 
+        - type: geth
+          port-mappings:
+            - "30303:30303"
+            - "30303:30303/udp"
+          resources:
+            networks:
+              - name: common-network
+        - type: ethstats
+          port-mappings:
+            - "80:3000"
+          resources: 
+              networks:
+                - name: common-network
