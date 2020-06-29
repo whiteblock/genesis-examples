@@ -26,8 +26,8 @@ services:
       MINER_GASPRICE: "1"
       MINER_THREADS: "1"
     resources:
-      cpus: 4
-      memory: 6 GB
+      cpus: 6
+      memory: 8 GB
       storage: 40 GiB
   
   - name: ethstats
@@ -128,6 +128,7 @@ task-runners:
         scope: singleton
     script: 
       inline: generate --accounts-file /accounts/accounts.json --network common-network --service geth | tee /accounts/static-nodes.json
+  
   - name: generate-keystore
     image: gcr.io/whiteblock/helpers/geth/keystore:master
     volumes:
@@ -139,6 +140,7 @@ task-runners:
         echo $_ACCOUNT_PASSWORD > /tmp/pw.txt;
         keystore -p /tmp/pw.txt -f /accounts/accounts.json -o /accounts/keystore/
     resources:
+      cpus: 2
       memory: 2 GB
 
   - name: await-block-production
