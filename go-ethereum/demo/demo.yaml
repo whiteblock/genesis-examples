@@ -1,10 +1,15 @@
 substitutions:
   _ACCOUNT_PASSWORD: "password"
   _ETH_NETWORK_ID: "7777"
-  _SPLUNK_HEC_URL: "https://104.155.159.170:8088"
-  _SPLUNK_HEC_TOKEN: "d1b8059a-3b66-4fa4-9a72-4d75b009caaa"
+  _SPLUNK_HEC_URL: "http://104.155.159.170:8088"
+  _SPLUNK_HEC_TOKEN: d1b8059a-3b66-4fa4-9a72-4d75b009caaa
   _ACCOUNTS_TO_CREATE: "20"
-
+  #_ETH_STATS_SECRET: testnet_secret
+  _ETH_STATS_SECRET: secret
+  #_ETH_STATS_SERVER: "${ETHSTATS_SERVICE0_COMMON_NETWORK}:3000"
+  _ETH_STATS_SERVER: 104.155.159.170:9002
+  _PHASE_ONE_BLOCKS: "100"
+  _PHASE_TWO_BLOCKS: "200"
 services: 
   - name: geth
     image: "ethereum/client-go:alltools-latest"
@@ -19,10 +24,9 @@ services:
         cp /accounts/static-nodes.json /geth/;
         echo $_ACCOUNT_PASSWORD > /geth/pw.txt;
         geth --nousb --datadir /geth/ init /accounts/genesis.json;
-        geth --networkid $_ETH_NETWORK_ID --datadir /geth/ --http --http.addr 0.0.0.0 --miner.gasprice=${MINER_GASPRICE} --http.api "admin,web3,eth,net,personal,miner,txpool" --http.corsdomain "0.0.0.0" --txpool.nolocals --http.vhosts=* --verbosity=5 --port 30303 --nousb --miner.etherbase $(cat /accounts/address${INDEX}) --unlock $(cat /accounts/address${INDEX}) --allow-insecure-unlock --password /geth/pw.txt --mine --miner.threads=${MINER_THREADS} --nodekeyhex $(cat /accounts/priv$INDEX) --ethstats $NAME:${ETH_STATS_SECRET}@${ETHSTATS_SERVICE0_COMMON_NETWORK}:3000 --nodiscover
+        geth --networkid $_ETH_NETWORK_ID --datadir /geth/ --http --http.addr 0.0.0.0 --miner.gasprice=${MINER_GASPRICE} --http.api "admin,web3,eth,net,personal,miner,txpool" --http.corsdomain "0.0.0.0" --txpool.nolocals --http.vhosts=* --verbosity=5 --port 30303 --nousb --miner.etherbase $(cat /accounts/address${INDEX}) --unlock $(cat /accounts/address${INDEX}) --allow-insecure-unlock --password /geth/pw.txt --mine --miner.threads=${MINER_THREADS} --nodekeyhex $(cat /accounts/priv$INDEX) --ethstats $NAME:$_ETH_STATS_SECRET@$_ETH_STATS_SERVER --nodiscover
   #--bootnodes enode://$(cat /accounts/nodekey0)@${GETH_SERVICE0_COMMON_NETWORK}:30303?discport=30303
     environment:
-      ETH_STATS_SECRET: testnet_secret
       MINER_GASPRICE: "1"
       MINER_THREADS: "1"
     resources:
@@ -93,7 +97,7 @@ sidecars:
       START_AT_BLOCK: latest
       SPLUNK_HEC_URL: "$_SPLUNK_HEC_URL"
       SPLUNK_HEC_TOKEN: "$_SPLUNK_HEC_TOKEN"
-      SPLUNK_EVENTS_INDEX: main
+      SPLUNK_EVENTS_INDEX: ethereum
       SPLUNK_METRICS_INDEX: metrics
       SPLUNK_INTERNAL_INDEX: metrics
       SPLUNK_HEC_REJECT_INVALID_CERTS: "false"
@@ -150,17 +154,17 @@ task-runners:
     resources:
       memory: 1 GB
 
-  - name: await-blocks-100
+  - name: await-blocks-$_PHASE_ONE_BLOCKS
     image: gcr.io/whiteblock/helpers/ethereum/await-blocks:master
     script:
-      inline: await --target $GETH_SERVICE0_COMMON_NETWORK:8545 --block 100
+      inline: await --target $GETH_SERVICE0_COMMON_NETWORK:8545 --block $_PHASE_ONE_BLOCKS
     resources:
       memory: 1 GB
 
-  - name: await-blocks-200
+  - name: await-blocks-$_PHASE_TWO_BLOCKS
     image: gcr.io/whiteblock/helpers/ethereum/await-blocks:master
     script:
-      inline: await --target $GETH_SERVICE0_COMMON_NETWORK:8545 --block 200
+      inline: await --target $GETH_SERVICE0_COMMON_NETWORK:8545 --block $_PHASE_TWO_BLOCKS
     resources:
       memory: 1 GB
 
@@ -223,9 +227,9 @@ tests:
             networks:
               - name: common-network
 
-      - name: waiting-for-block-100
+      - name: waiting-for-block-$_PHASE_ONE_BLOCKS
         tasks:
-          - type: await-blocks-100
+          - type: await-blocks-$_PHASE_ONE_BLOCKS
             timeout: 60m
             networks:
               - name: common-network
@@ -239,9 +243,9 @@ tests:
               - name: common-network
                 latency: 300ms
 
-      - name: waiting-for-block-200
+      - name: waiting-for-block-$_PHASE_TWO_BLOCKS
         tasks:
-          - type: await-blocks-200
+          - type: await-blocks-$_PHASE_TWO_BLOCKS
             timeout: 60m
             networks:
               - name: common-network
