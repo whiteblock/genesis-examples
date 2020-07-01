@@ -1,0 +1,251 @@
+substitutions:
+  _ACCOUNT_PASSWORD: "password"
+  _ETH_NETWORK_ID: "7777"
+  _SPLUNK_HEC_URL: "http://104.155.159.170:8088"
+  _SPLUNK_HEC_TOKEN: d1b8059a-3b66-4fa4-9a72-4d75b009caaa
+  _ACCOUNTS_TO_CREATE: "20"
+  #_ETH_STATS_SECRET: testnet_secret
+  _ETH_STATS_SECRET: secret
+  #_ETH_STATS_SERVER: "${ETHSTATS_SERVICE0_COMMON_NETWORK}:3000"
+  _ETH_STATS_SERVER: 104.155.159.170:9002
+  _PHASE_ONE_BLOCKS: "100"
+  _PHASE_TWO_BLOCKS: "200"
+services: 
+  - name: geth
+    image: "ethereum/client-go:alltools-latest"
+    volumes:
+      - path: /accounts/
+        name: accounts
+        scope: singleton
+    script:
+      inline: >
+        mkdir -p /geth/keystore;
+        cp /accounts/keystore/* /geth/keystore;
+        cp /accounts/static-nodes.json /geth/;
+        echo $_ACCOUNT_PASSWORD > /geth/pw.txt;
+        geth --nousb --datadir /geth/ init /accounts/genesis.json;
+        geth --networkid $_ETH_NETWORK_ID --datadir /geth/ --http --http.addr 0.0.0.0 --miner.gasprice=${MINER_GASPRICE} --http.api "admin,web3,eth,net,personal,miner,txpool" --http.corsdomain "0.0.0.0" --txpool.nolocals --http.vhosts=* --verbosity=5 --port 30303 --nousb --miner.etherbase $(cat /accounts/address${INDEX}) --unlock $(cat /accounts/address${INDEX}) --allow-insecure-unlock --password /geth/pw.txt --mine --miner.threads=${MINER_THREADS} --nodekeyhex $(cat /accounts/priv$INDEX) --ethstats $NAME:$_ETH_STATS_SECRET@$_ETH_STATS_SERVER --nodiscover
+  #--bootnodes enode://$(cat /accounts/nodekey0)@${GETH_SERVICE0_COMMON_NETWORK}:30303?discport=30303
+    environment:
+      MINER_GASPRICE: "1"
+      MINER_THREADS: "1"
+    resources:
+      cpus: 6
+      memory: 8 GB
+      storage: 40 GiB
+  
+  - name: ethstats
+    image: gcr.io/whiteblock/ethstats:master
+    environment:
+      HOST: "0.0.0.0"
+    input-files:
+      - source-path: ws_secret.json
+        destination-path: /eth-netstats/ws_secret.json
+    resources:
+      memory: 1 GB
+  
+  - name: record
+    image: gcr.io/whiteblock/helpers/ethereum/record:master
+    script:
+      inline:
+        app --target http://$GETH_SERVICE0_COMMON_NETWORK:8545
+    resources:
+      memory: 1 GiB
+
+  - name: tps-logger
+    image: gcr.io/whiteblock/helpers/ethereum/tps-logger:master
+    script:
+      inline: tps-logger --node $GETH_SERVICE0_COMMON_NETWORK:8545 --record $RECORD_SERVICE0_COMMON_NETWORK:8080 --listen 0.0.0.0:17777
+    resources:
+      memory: 1 GiB
+
+  - name: eth-viewer
+    image: gcr.io/whiteblock/helpers/ethereum/viewer:latest
+    script:
+      inline: viewer --node $GETH_SERVICE0_COMMON_NETWORK:8545 --listen 0.0.0.0:16555
+    resources:
+      memory: 1 GiB
+
+sidecars:
+  - name: background-transactions
+    sidecar-to:
+      - geth
+    volumes:
+      - path: /accounts/
+        name: accounts
+        scope: singleton
+    image: gcr.io/whiteblock/helpers/ethereum/tx:master
+    script:
+      inline: tx --chain-id $_ETH_NETWORK_ID --tps ${TPS} --target $SERVICE:8545 --private-key-file /accounts/accounts.json --gas-limit ${GAS_LIMIT}
+    environment:
+      TPS: "80"
+      GAS_LIMIT: "4000000"
+    resources:
+      cpus: 2
+      memory: 3 GB
+
+  - name: ethlogger
+    sidecar-to:
+     - geth
+    image: gcr.io/whiteblock/splunk:latest
+    resources:
+      memory: 4 GB
+    script:
+      inline: ethlogger --eth-rpc-url=http://$SERVICE:8545
+    environment:
+      NETWORK_NAME: whiteblock
+      START_AT_BLOCK: latest
+      SPLUNK_HEC_URL: "$_SPLUNK_HEC_URL"
+      SPLUNK_HEC_TOKEN: "$_SPLUNK_HEC_TOKEN"
+      SPLUNK_EVENTS_INDEX: ethereum
+      SPLUNK_METRICS_INDEX: metrics
+      SPLUNK_INTERNAL_INDEX: metrics
+      SPLUNK_HEC_REJECT_INVALID_CERTS: "false"
+
+task-runners:
+  - name: generate-accounts
+    image: "gcr.io/whiteblock/helpers/ethereum/accounts:master"
+    script:
+      inline: accounts generate -c $_ACCOUNTS_TO_CREATE -e -d /accounts
+    volumes:
+      - path: /accounts/
+        name: accounts
+        scope: singleton
+    resources:
+      memory: 2 GB
+
+  - name: generate-genesis
+    image: gcr.io/whiteblock/helpers/ethereum/genesis:master
+    volumes:
+      - path: /accounts/
+        name: accounts
+        scope: singleton
+    script:
+      inline: genesis generate -a /accounts/accounts.json -o consensus=ethhash | tee /accounts/genesis.json
+    resources:
+      memory: 2 GB
+  - name: generate-static-peers
+    image: gcr.io/whiteblock/helpers/ethereum/static-peers:master
+    volumes:
+      - path: /accounts/
+        name: accounts
+        scope: singleton
+    script: 
+      inline: generate --accounts-file /accounts/accounts.json --network common-network --service geth | tee /accounts/static-nodes.json
+  
+  - name: generate-keystore
+    image: gcr.io/whiteblock/helpers/geth/keystore:master
+    volumes:
+      - path: /accounts/
+        name: accounts
+        scope: singleton
+    script:
+      inline: >
+        echo $_ACCOUNT_PASSWORD > /tmp/pw.txt;
+        keystore -p /tmp/pw.txt -f /accounts/accounts.json -o /accounts/keystore/
+    resources:
+      cpus: 2
+      memory: 2 GB
+
+  - name: await-block-production
+    image: gcr.io/whiteblock/helpers/ethereum/await-blocks:master
+    script:
+      inline: await --target $GETH_SERVICE0_COMMON_NETWORK:8545
+    resources:
+      memory: 1 GB
+
+  - name: await-blocks-$_PHASE_ONE_BLOCKS
+    image: gcr.io/whiteblock/helpers/ethereum/await-blocks:master
+    script:
+      inline: await --target $GETH_SERVICE0_COMMON_NETWORK:8545 --block $_PHASE_ONE_BLOCKS
+    resources:
+      memory: 1 GB
+
+  - name: await-blocks-$_PHASE_TWO_BLOCKS
+    image: gcr.io/whiteblock/helpers/ethereum/await-blocks:master
+    script:
+      inline: await --target $GETH_SERVICE0_COMMON_NETWORK:8545 --block $_PHASE_TWO_BLOCKS
+    resources:
+      memory: 1 GB
+
+tests: 
+  - name: geth_demo
+    phases:
+      - name: generating-accounts
+        tasks: 
+        - type: generate-accounts
+        system:
+          - type: ethstats
+            resources:
+              networks:
+                - name: common-network
+            port-mappings:
+            - "3000:3000"
+      
+      - name: creating-keystore-genesis-static-peers
+        tasks:
+          - type: generate-genesis
+          - type: generate-keystore
+          - type: generate-static-peers
+      
+      - name: starting-geth-nodes
+        system:
+          - type: geth
+            count: 7
+            resources:
+              networks:
+                - name: common-network
+      
+      - name: awaiting-block-production
+        tasks:
+          - type: await-block-production
+            timeout: 10m
+            networks:
+              - name: common-network
+
+      - name: starting-stats-tools
+        system:
+        - type: record
+          port-mappings:
+            - "8080:8080"
+          resources:
+            networks:
+              - name: common-network
+
+      - name: start-custom-viewers
+        system:
+        - type: tps-logger 
+          port-mappings:
+            - "17777:17777"
+          resources:
+            networks:
+              - name: common-network
+        - type: eth-viewer
+          port-mappings:
+            - "16555:16555"
+          resources:
+            networks:
+              - name: common-network
+
+      - name: waiting-for-block-$_PHASE_ONE_BLOCKS
+        tasks:
+          - type: await-blocks-$_PHASE_ONE_BLOCKS
+            timeout: 60m
+            networks:
+              - name: common-network
+
+      - name: setting-up-network-impairments
+        system:
+        - type: geth
+          count: 7
+          resources:
+            networks:
+              - name: common-network
+                latency: 300ms
+
+      - name: waiting-for-block-$_PHASE_TWO_BLOCKS
+        tasks:
+          - type: await-blocks-$_PHASE_TWO_BLOCKS
+            timeout: 60m
+            networks:
+              - name: common-network
