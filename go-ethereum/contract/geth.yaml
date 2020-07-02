@@ -80,7 +80,7 @@ task-runners:
         sed -i "s/_PORT_/8545/g" /contracts/truffle-config.js;
         truffle compile;
         truffle migrate --reset --network development;
-    resoures:
+    resources:
       cpus: 1
       memory: 2 GB
     input-files:
@@ -101,15 +101,7 @@ tests:
     phases:
       - name: generating-accounts
         tasks: 
-        - type: generate-accounts
-        system:
-          - type: ethstats
-            resources:
-              networks:
-                - name: common-network
-            port-mappings:
-            - "3000:3000"
-      
+        - type: generate-accounts      
       - name: creating-keystore-genesis-static-peers
         tasks:
           - type: generate-genesis
@@ -117,6 +109,7 @@ tests:
           - type: generate-static-peers
       
       - name: starting-geth-nodes
+        duration: 2m
         system:
           - type: geth
             count: 7
@@ -135,3 +128,7 @@ tests:
         duration: 30m
         tasks:
           - type: deploy-contract
+            timeout: 10m
+            networks:
+              - name: common-network
+
