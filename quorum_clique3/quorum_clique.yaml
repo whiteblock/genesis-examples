@@ -1,0 +1,58 @@
+services:
+  - name: Quorum
+    image: quorumengineering/quorum:2.2.5
+    volumes:
+      - path: /staticpeers/
+        name: staticpeers
+        scope: singleton
+    resources:
+      cpus: 4
+      memory: 4 GB
+    input-files:
+      - source-path: genesis.json
+        destination-path: /data/genesis.json
+      - source-path: key$_n
+        destination-path: /data/keystore/key$_n
+      - source-path: nodekey$_n
+        destination-path: /data/nodekey
+      - source-path: passwords.txt
+        destination-path: /data/passwords.txt
+    script:
+      inline: cp /staticpeers/static-nodes.json /data/static-nodes.json && cp /staticpeers/static-nodes.json /data/permissioned-nodes.json && geth --datadir /data init data/genesis.json; geth --datadir /data --unlock 0 --password /data/passwords.txt --ethstats $NAME:secret@ethstats-service0:3000 --syncmode full --mine --minerthreads 1 --rpc --rpcaddr 0.0.0.0 --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum  --verbosity 5
+  
+  - name: ethstats
+    image: gcr.io/whiteblock/ethstats:master
+    environment:
+      HOST: "0.0.0.0"
+    input-files:
+      - source-path: ws_secret.json
+        destination-path: /eth-netstats/ws_secret.json     
+task-runners:
+  - name: static-peers # generate static peers
+    image: "gcr.io/whiteblock/helpers/besu/staticpeers:master"
+    volumes:
+      - path: /staticpeers/
+        name: staticpeers
+        scope: singleton
+    script:
+      inline:  ./besuStaticPeers generate -a '[{"publicKey":"ac6b1096ca56b9f6d004b779ae3728bf83f8e22453404cc3cef16a3d9b96608bc67c4b30db88e0a5a6c6390213f7acbe1153ff6d23ce57380104288ae19373ef"},{"publicKey":"0ba6b9f606a43a95edc6247cdb1c1e105145817be7bcafd6b2c0ba15d58145f0dc1a194f70ba73cd6f4cdd6864edc7687f311254c7555cc32e4d45aeb1b80416"},{"publicKey":"579f786d4e2830bbcc02815a27e8a9bacccc9605df4dc6f20bcc1a6eb391e7225fff7cb83e5b4ecd1f3a94d8b733803f2f66b7e871961e7b029e22c155c3a778"}]' --ip '["'$QUORUM_SERVICE0_QUORUM_NETWORK'", "'$QUORUM_SERVICE1_QUORUM_NETWORK'", "'$QUORUM_SERVICE2_QUORUM_NETWORK'"]' >> /staticpeers/static-nodes.json
+tests:
+  - name: testnet
+    description: run an EEA testnet and execute some simple transactions
+    phases:
+      - name: generate-static-peers
+        tasks:
+          - type: static-peers
+      - name: start-quorum
+        system:
+          - type: Quorum 
+            count: 3
+            resources:
+              networks:
+                - name: quorum_network
+          - type: ethstats
+            port-mappings:
+              - "3000:3000"
+            resources:
+              networks:
+                - name: quorum_network
